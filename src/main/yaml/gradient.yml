@@ -1,0 +1,46 @@
+network-model:
+  type: ConnectWithinDistance
+  parameters: [5]
+
+incarnation: collektive
+
+variables:
+  speed: &speed
+    formula: 0.001
+
+environment:
+  type: OSMEnvironment
+  parameters: ["kiel.pbf", false]
+
+_pool: &aggregateProgram
+  - time-distribution: 1
+    type: Event
+    actions:
+      - type: RunCollektiveProgram
+        parameters: [it.unibo.collektive.examples.gradient.GradientKt.gradientEntrypoint]
+
+_moveShip: &moveShip
+  type: Event
+  time-distribution: 1
+  actions:
+    - type: MoveOnMapK
+      parameters:
+        routing-strategy:
+          #type: ObstacleAvoidance
+          type: IgnoreStreetsK
+        speed-selection-strategy: *speed
+        target-selection-strategy:
+          type: GoTo
+          parameters: [54.351942, 10.176475]
+
+deployments:
+  - type: Point
+    parameters: [54.344718, 10.155997]
+    programs:
+      - *aggregateProgram
+      - *moveShip
+    contents:
+      - molecule: source
+        concentration: false
+      - molecule: destination
+        concentration:
