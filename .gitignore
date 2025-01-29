@@ -179,4 +179,35 @@ src/maps/*.geojson
 .history/
 .gradle/
 .idea/
+.vscode/
+
+# Local Files
+[lLocal]
+*[lL]ocal/
+.[lL]ocal/
+
+# Bin Files
+[Bb]in/
+.[Bb]in/
+
+# Dev Files
+[Dd]ev
+*[Dd]ev/
+.[Dd]ev/
+
+# History Files
+.[hH]istory
+*.[hH]istory/
+
+# Local History for Visual Studio
+.localhistory/
+
+# PyCache files
+__pycache__/
+.__pycache__/
+*.__pycache__/
+_version.py
+*.pyc
+-mypy_cache/
+.mypy_cache/
 
