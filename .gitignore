@@ -172,7 +172,8 @@ cython_debug/
 .pypirc
 
 # Maps
-*.geojson
+src/maps/*.h5
+src/maps/*.geojson
 
 # VSCode History files
 .history/
