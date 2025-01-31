@@ -11,4 +11,4 @@ develocity {
     }
 }
 
-rootProject.name = "collektive-experiments-bootstrap"
+rootProject.name = "aggreg_colav"
