@@ -116,5 +116,11 @@ class TestGeojsonLoading {
             }
         }
 
+        // Known limit of the representation: outside the polygon in the geojson the point is regognised as navigable,
+        // even if it's not.
+        // For the simulation purpose this should be ok, but consider this in general.
+        // This should be FALSE:
+        assertTrue { geojsonObject.accept(IsNavigableFor(LngLatAlt(9.956511, 54.346068))) }
+
     }
 }
