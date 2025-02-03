@@ -24,11 +24,18 @@ sourceSets {
         dependencies {
             implementation(libs.bundles.alchemist)
             implementation(libs.bundles.collektive)
+            implementation(libs.data2viz.geojson)
+            implementation(libs.bundles.jackson)
+            testImplementation(kotlin("test"))
         }
         resources {
             srcDir("src/main/yaml")
         }
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 multiJvm {

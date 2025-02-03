@@ -14,6 +14,12 @@ collektive-incarnation = { module = "it.unibo.collektive:alchemist-incarnation-c
 collektive-plugin = { module = "it.unibo.collektive:compiler-plugin", version.ref = "collektive" }
 collektive-stdlib = { module = "it.unibo.collektive:stdlib", version.ref = "collektive" }
 
+data2viz-geojson = { module = "io.data2viz.geojson:geojson-jvm", version = "0.6.0" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version = "2.7.3" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.7.3" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version = "2.7.0" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version = "2.9.0" }
+
 [bundles]
 alchemist = [
     "alchemist",
@@ -23,6 +29,13 @@ alchemist = [
     "alchemist-maps"
 ]
 collektive = ["collektive", "collektive-incarnation", "collektive-plugin", "collektive-stdlib"]
+
+jackson = [
+    "jackson-annotations",
+    "jackson-core",
+    "jackson-databind",
+    "jackson-module-kotlin"
+]
 
 [plugins]
 collektive = { id = "it.unibo.collektive.collektive-plugin", version.ref = "collektive" }
