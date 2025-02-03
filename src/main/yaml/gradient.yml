@@ -10,7 +10,7 @@ variables:
 
 environment:
   type: OSMEnvironment
-  parameters: ["kiel.pbf", false]
+  parameters: ["maps/kiel.pbf", false]
 
 _pool: &aggregateProgram
   - time-distribution: 1
