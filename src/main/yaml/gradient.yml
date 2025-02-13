@@ -6,11 +6,11 @@ incarnation: collektive
 
 variables:
   speed: &speed
-    formula: 0.001
+    formula: 0.2
 
 environment:
-  type: OSMEnvironment
-  parameters: ["maps/kiel.pbf", false]
+  type: NavigationEnvironment
+  parameters: ["maps/coast_only.geojson"]
 
 _pool: &aggregateProgram
   - time-distribution: 1
@@ -20,24 +20,23 @@ _pool: &aggregateProgram
         parameters: [it.unibo.collektive.examples.gradient.GradientKt.gradientEntrypoint]
 
 _moveShip: &moveShip
-  type: Event
-  time-distribution: 1
-  actions:
-    - type: MoveOnMapK
-      parameters:
-        routing-strategy:
-          #type: ObstacleAvoidance
-          type: IgnoreStreetsK
-        speed-selection-strategy: *speed
-        target-selection-strategy:
-          type: GoTo
-          parameters: [54.351942, 10.176475]
+  - type: Event
+    time-distribution: 1
+    actions:
+      - type: NavigateOnMap
+        parameters:
+          routing-strategy:
+            #type: ObstacleAvoidance
+            type: NavigationWithinBoundaries
+          speed-selection-strategy: *speed
+          target-selection-strategy:
+            type: GoTo
+            parameters: [54.353532, 10.191714]
 
 deployments:
   - type: Point
     parameters: [54.344718, 10.155997]
     programs:
-      - *aggregateProgram
       - *moveShip
     contents:
       - molecule: source
