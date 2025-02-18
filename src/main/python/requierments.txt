@@ -1,0 +1,15 @@
+numpy
+gymnasium == 1.0.0
+
+pandas
+scipy ==  1.14.1
+tensorflow
+tensorboardX
+torch
+dm-tree
+pyarrow
+ray == 2.39.0
+lz4
+ipython
+jupyter
+pillow
