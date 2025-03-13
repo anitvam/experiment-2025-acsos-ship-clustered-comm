@@ -2,6 +2,7 @@
 kotlin = "2.1.0"
 alchemist = "37.1.5"
 collektive = "12.3.1"
+aislib = "2.8.4"
 
 [libraries]
 alchemist = { module = "it.unibo.alchemist:alchemist", version.ref = "alchemist" }
@@ -20,6 +21,12 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", ver
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version = "2.7.0" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version = "2.9.0" }
 
+aislib-messages = { module = "dk.dma.ais.lib:ais-lib-messages", version.ref = "aislib" }
+aislib-utils = { module = "dk.dma.ais.lib:ais-lib-utils", version.ref = "aislib" }
+aislib-communication = { module = "dk.dma.ais.lib:ais-lib-communication", version.ref = "aislib" }
+aislib-parent = { module = "dk.dma.ais.lib:ais-parent", version.ref = "aislib" }
+aislib-json = { module = "dk.dma.ais.lib:ais-lib-json", version.ref = "aislib" }
+
 [bundles]
 alchemist = [
     "alchemist",
@@ -35,6 +42,14 @@ jackson = [
     "jackson-core",
     "jackson-databind",
     "jackson-module-kotlin"
+]
+
+aislib = [
+    "aislib-communication",
+    "aislib-json",
+    "aislib-messages",
+    "aislib-parent",
+    "aislib-utils"
 ]
 
 [plugins]

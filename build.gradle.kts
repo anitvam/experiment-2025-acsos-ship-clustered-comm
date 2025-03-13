@@ -26,6 +26,7 @@ sourceSets {
             implementation(libs.bundles.collektive)
             implementation(libs.data2viz.geojson)
             implementation(libs.bundles.jackson)
+            implementation(libs.bundles.aislib)
             testImplementation(kotlin("test"))
         }
         resources {
@@ -146,4 +147,11 @@ tasks.withType(KotlinCompile::class).all {
     compilerOptions {
         allWarningsAsErrors = false
     }
+}
+
+tasks.withType<Test> {
+    this.testLogging {
+        this.showStandardStreams = true
+    }
+    jvmArgs("--add-opens=java.base/java.util=ALL-UNNAMED")
 }
