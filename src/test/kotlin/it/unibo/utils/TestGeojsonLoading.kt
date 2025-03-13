@@ -1,11 +1,11 @@
-package it.unibo.aggregcolav
+package it.unibo.utils
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.data2viz.geojson.JacksonGeoJsonObject
 import io.data2viz.geojson.jackson.*
-import it.unibo.aggregcolav.geojson.IsNavigableVisitor
+import it.unibo.util.geojson.IsNavigableVisitor
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertFalse

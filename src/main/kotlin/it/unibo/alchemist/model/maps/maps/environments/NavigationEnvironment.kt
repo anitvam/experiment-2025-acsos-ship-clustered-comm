@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.data2viz.geojson.JacksonGeoJsonObject
-import it.unibo.aggregcolav.geojson.IsNavigableVisitor
-import it.unibo.aggregcolav.geojson.toLngLatAlt
+import it.unibo.util.geojson.IsNavigableVisitor
+import it.unibo.util.geojson.toLngLatAlt
 import it.unibo.alchemist.model.GeoPosition
 import it.unibo.alchemist.model.Incarnation
 import it.unibo.alchemist.model.environments.Abstract2DEnvironment

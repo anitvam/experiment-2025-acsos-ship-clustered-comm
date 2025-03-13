@@ -1,4 +1,4 @@
-package it.unibo.aggregcolav.geojson
+package it.unibo.util.geojson
 
 import io.data2viz.geojson.jackson.*
 
