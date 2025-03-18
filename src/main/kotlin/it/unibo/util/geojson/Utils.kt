@@ -24,6 +24,7 @@ fun MultiPolygon.asListOfPoligon(): List<Polygon> {
 }
 
 fun LatLongPosition.toLngLatAlt() = LngLatAlt(longitude, latitude)
+fun LngLatAlt.toLatLongPosition() = LatLongPosition(latitude, longitude)
 
 fun LngLatAlt.insideOf(polygon: Polygon): Boolean {
     if(polygon.coordinates.size > 1)

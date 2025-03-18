@@ -5,7 +5,7 @@ import java.io.File
 import java.time.Instant
 
 object AisDecoder {
-    fun parseRaw(payload: String, date: String):  Map<Instant, AisMessage> {
+    fun parsePayload(payload: String, date: String):  Map<Instant, AisMessage> {
         val aisMessageBuilder = AisCustomMessageParser()
         val payloadDecoded: MutableMap<Instant, AisMessage> = mutableMapOf()
         payload.lines().forEach {
@@ -27,13 +27,12 @@ object AisDecoder {
         return payloadDecoded
     }
 
-    fun parseFromPath(path: String): Map<Instant, AisMessage> {
-        val file = File(path)
-        val dateLong = path.substringAfterLast("/").substringBefore("-")
+    fun parseFile(file: File): Map<Instant, AisMessage> {
+        val dateLong = file.name.substringAfterLast("/").substringBefore("-")
         val year = dateLong.take(4)
         val month = dateLong.drop(4).take(2)
         val day = dateLong.takeLast(2)
         val date = "${year}-${month}-${day}"
-        return parseRaw(file.readText(Charsets.UTF_8), date)
+        return parsePayload(file.readText(Charsets.UTF_8), date)
     }
 }

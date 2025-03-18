@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignore GPS data routes
+src/main/resources/navigation-routes/**
+
 # Intellij Data
 .idea/
 

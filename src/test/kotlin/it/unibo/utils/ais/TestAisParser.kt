@@ -1,42 +1,40 @@
 package it.unibo.utils.ais
 
 import dk.dma.ais.message.AisMessage
-import it.unibo.collektive.stdlib.iterables.FieldedCollectionsExtensions.groupBy
 import it.unibo.util.ais.AisCustomMessageParser
 import it.unibo.util.ais.AisDecoder
 import it.unibo.util.ais.AisPayload
 import it.unibo.util.gpx.GpxFormatter
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.io.File
+import java.io.FileFilter
+import java.io.FilenameFilter
 import java.time.Instant
+import java.util.regex.Pattern
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class TestAisParser {
 
-    fun gatherPath(): String {
-        val aisPath = System.getenv("AIS_DATA_SAMPLE")
-        println("AIS path: $aisPath")
-        assertNotNull(aisPath, "AIS path not set, consider setting the environment variable AIS_DATA_SAMPLE")
-        return aisPath
-    }
-
     @Test
     fun testParseFile() {
-        val aisMessage = AisDecoder.parseFromPath(gatherPath())
+        val aisMessage = AisDecoder.parseFile(dataToParse.first())
         println(aisMessage)
     }
 
     @Test
     fun testConversionToAisPayload() {
-        val aisMessage = AisDecoder.parseFromPath(gatherPath())
+        val aisMessage = AisDecoder.parseFile(dataToParse.first())
+        println(aisMessage)
         val aisPayloads = AisPayload.from(aisMessage)
         println(aisPayloads)
     }
 
     @Test
     fun testDeriveNumberOfBoats(){
-        val aisMessage = AisDecoder.parseFromPath(gatherPath())
+        val aisMessage = AisDecoder.parseFile(dataToParse.first())
         val aisPayloads = AisPayload.from(aisMessage)
         val groupedByBoat = aisPayloads.groupBy { it.boatId }
         println(groupedByBoat.count())
@@ -45,8 +43,8 @@ class TestAisParser {
 
     @Test
     fun testGpxGenerationFromAisData() {
-        val aisMessage = AisDecoder.parseFromPath(gatherPath())
-        val xmlPath = System.getenv("OUTPUT_XML_TEST")
+        val aisMessage = AisDecoder.parseFile(dataToParse.first())
+        val xmlPath = outputXmlPath
         val aisPayloads = AisPayload.from(aisMessage)
         val groupedByBoat = aisPayloads.groupBy { it.boatId }
         println(groupedByBoat.count())
@@ -67,22 +65,28 @@ class TestAisParser {
     }
 
     @Test
-    fun testParseFolder() {
-        val aisMessagesFolder = System.getenv("AIS_DATA_FOLDER")
-        val xmlPath = System.getenv("OUTPUT_XML_TEST")
-
+    fun parseDayData() {
         val aisMessages: MutableMap<Instant, AisMessage> = mutableMapOf()
-        println(aisMessagesFolder)
-        File(aisMessagesFolder).also{
-            println(it)}.listFiles()?.forEach {
-            aisMessages.putAll(AisDecoder.parseFromPath(it.path))
+        dataToParse.forEach {
+            aisMessages.putAll(AisDecoder.parseFile(it))
         }
-
         val aisPayloads = AisPayload.from(aisMessages)
-        val groupedByBoat = aisPayloads.groupBy { it.boatId }
+        GpxFormatter.createGpxFileFromAisData(aisPayloads, outputXmlPath)
+    }
 
-        println(groupedByBoat.count())
-        val boat = groupedByBoat.keys.random()
-        groupedByBoat[boat]?.let { GpxFormatter.createGpxFileFromAisData(it, xmlPath) }
+    companion object {
+
+        val dataToParse: List<File> = File("/home/anitvam/work/experiments/202208").listFiles { file ->
+            Pattern.compile("20220818.+").matcher(file.name).matches()
+        }.ifEmpty { throw IllegalStateException("No suitable file found") }.toList()
+
+        val outputXmlPath = File("/home/anitvam/work/experiments/aggreg_colav/src/main/resources/navigation-routes")
+
+        @JvmStatic
+        @BeforeAll
+        fun checkFilesExist(): Unit {
+            assertDoesNotThrow { dataToParse }
+            assertNotNull(dataToParse)
+        }
     }
 }

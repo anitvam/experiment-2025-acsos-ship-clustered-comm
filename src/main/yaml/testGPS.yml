@@ -1,0 +1,29 @@
+environment:
+  type: NavigationEnvironment
+  parameters: ["maps/kiel_coastline_linesf.geojson"]
+
+incarnation: collektive
+
+_pools:
+  - pool: &move
+      - time-distribution: 0.1
+        type: Event
+        actions:
+          - type: ReproduceGPSTrace
+            parameters: [0.005, "navigation-routes", false, "AlignToSimulationTime"]
+
+deployments:
+  - type: FromGPSTrace
+    parameters:
+      - 9 # Number of ships
+      - "navigation-routes" # Folder containing traces
+      - false
+      - "AlignToSimulationTime"
+    programs:
+      - *move
+
+terminate:
+  type: StableForSteps
+  parameters:
+    equalIntervals: 5
+    checkInterval: 100

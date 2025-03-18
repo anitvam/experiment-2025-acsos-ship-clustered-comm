@@ -3,6 +3,7 @@ package it.unibo.alchemist.model.maps.maps.environments
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.data2viz.geojson.GeoJsonObject
 import io.data2viz.geojson.JacksonGeoJsonObject
 import it.unibo.util.geojson.IsNavigableVisitor
 import it.unibo.util.geojson.toLngLatAlt
@@ -44,9 +45,11 @@ MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironme
     }
 
     fun isPositionNavigable(position: GeoPosition): Boolean = when(position) {
-        is LatLongPosition ->isPositionNavigable(position)
+        is LatLongPosition -> isPositionNavigable(position)
         else -> error("Not yet implemented!")
     }
+
+    fun getGeoJsonObject(): JacksonGeoJsonObject = geoJsonObject
 
     fun isPositionNavigable(position: LatLongPosition): Boolean =
         geoJsonObject.accept(IsNavigableVisitor(position.toLngLatAlt()))

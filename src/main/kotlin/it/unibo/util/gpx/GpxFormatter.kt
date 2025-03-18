@@ -2,50 +2,46 @@ package it.unibo.util.gpx
 
 import it.unibo.util.ais.AisPayload
 import java.io.File
-import java.time.Instant
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
-import org.w3c.dom.Document
 
 object GpxFormatter {
-    fun createGpxFileFromAisData(aisDataList: List<AisPayload>, outputFilePath: String) {
-        val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        val document: Document = documentBuilder.newDocument()
+    fun createGpxFileFromAisData(aisData: List<AisPayload>, outputFolder: File) {
 
-        // Root element <gpx> creation
-        val gpxElement = document.createElement("gpx")
-        gpxElement.setAttribute("version", "1.1")
-        gpxElement.setAttribute("creator", "AIS-to-GPX Converter")
-        document.appendChild(gpxElement)
+        val gpxHeader = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+    """.trimIndent()
 
-        // Creation of <trk> trace
-        val trkElement = document.createElement("trk")
-        gpxElement.appendChild(trkElement)
+        val gpxFooter = "</gpx>"
 
-        // Create track segment <trkseg>
-        val trkSegElement = document.createElement("trkseg")
-        trkElement.appendChild(trkSegElement)
+        // Group AIS data by boatId
+        val groupedData = aisData.groupBy { it.boatId }
 
-        // Add positions <trkpt>
-        for (data in aisDataList) {
-            val trkPtElement = document.createElement("trkpt")
-            trkPtElement.setAttribute("lat", data.latitude.toString())
-            trkPtElement.setAttribute("lon", data.longitude.toString())
+        groupedData.entries.take(10).forEach { (boatId, points) ->
+            val tracks = """
+            <trk>
+                <name>Boat $boatId</name>
+                <trkseg>
+                    ${points.joinToString("\n") { point ->
+                    """
+                        <trkpt lat="${point.latitude}" lon="${point.longitude}">
+                            <ele>0</ele>
+                            <time>${point.timestamp}</time>
+                        </trkpt>
+                        """.trimIndent()
+                }}
+                </trkseg>
+            </trk>
+            """.trimIndent()
 
-            val timeElement = document.createElement("time")
-            timeElement.textContent = data.timestamp.toString()
-            trkPtElement.appendChild(timeElement)
+            // Construct output file gpx
+            val outputGpx =  "$gpxHeader\n$tracks\n$gpxFooter"
 
-            trkSegElement.appendChild(trkPtElement)
+            // Create file for boatID
+            val file = File("${outputFolder.path}/$boatId.gpx")
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+            file.writeText(outputGpx)
         }
-
-        // Save
-        val transformerFactory = TransformerFactory.newInstance()
-        val transformer = transformerFactory.newTransformer()
-        val source = DOMSource(document)
-        val result = StreamResult(File(outputFilePath))
-        transformer.transform(source, result)
     }
 }
