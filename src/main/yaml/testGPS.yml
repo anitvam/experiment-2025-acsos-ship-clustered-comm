@@ -1,6 +1,6 @@
 environment:
   type: NavigationEnvironment
-  parameters: ["maps/kiel_coastline_linesf.geojson"]
+  parameters: ["maps/north_germany_coastline.geojson"]
 
 incarnation: collektive
 
