@@ -1,6 +1,8 @@
 environment:
   type: NavigationEnvironment
-  parameters: ["maps/north_germany_coastline.geojson"]
+  parameters:
+    - ["maps/north_germany_coastline.geojson"]
+    - ["maps/north_germany_waterways.geojson", "maps/north_germany_waterways3.geojson"]
 
 incarnation: collektive
 
@@ -16,7 +18,7 @@ deployments:
   - type: FromGPSTrace
     parameters:
       - 9 # Number of ships
-      - "navigation-routes" # Folder containing traces
+      - "navigation-routes" # Folder containing GPS traces
       - false
       - "AlignToSimulationTime"
     programs:

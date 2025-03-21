@@ -1,5 +1,16 @@
 [
   {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShoreline",
+    "markerNodeID": 0
+  },
+  {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawRoutes",
+    "markerNodeID": 1
+  },
+  {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawTrajectory"
+  },
+  {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
     "curIncarnation": "collektive",
     "mode": "FILL_ELLIPSE",
@@ -58,9 +69,5 @@
     "colorCache": {
       "value": -16777216
     }
-  },
-  {
-    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShoreline",
-    "markerNodeID": 0
   }
 ]

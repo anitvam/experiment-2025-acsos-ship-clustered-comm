@@ -19,14 +19,15 @@ import java.io.File
 
 class NavigationEnvironment<T>(
      incarnation: Incarnation<T, GeoPosition>,
-     val path: String,
-):
-MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironment(incarnation){
+     shorelineFiles: List<String>,
+     routesFiles: List<String>,
+) : MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironment(incarnation){
 
-    private lateinit var geoJsonObject: JacksonGeoJsonObject
+    // Loading
+    private val geoJsonObjectsForShoreline: List<JacksonGeoJsonObject> = shorelineFiles.map { deserializeGeoJSON(it) }
+    private val geoJsonObjectsForRoutes: List<JacksonGeoJsonObject> = routesFiles.map { deserializeGeoJSON(it) }
 
-    init {
-        // Loading
+    private fun deserializeGeoJSON(path: String): JacksonGeoJsonObject {
         val file = this::class.java.classLoader.getResource(path)?.toURI()?.let { File(it) }
         if (file == null) {
             throw IllegalArgumentException("Nor resource $path exist")
@@ -41,7 +42,7 @@ MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironme
             .registerKotlinModule()
             .findAndRegisterModules()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        geoJsonObject = customMapper.readValue(file, JacksonGeoJsonObject::class.java)
+        return customMapper.readValue(file, JacksonGeoJsonObject::class.java)
     }
 
     fun isPositionNavigable(position: GeoPosition): Boolean = when(position) {
@@ -49,10 +50,11 @@ MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironme
         else -> error("Not yet implemented!")
     }
 
-    fun getGeoJsonObject(): JacksonGeoJsonObject = geoJsonObject
+    fun getGeoJsonObjectsForRoutes(): List<JacksonGeoJsonObject> = geoJsonObjectsForRoutes
+    fun getGeoJsonObjectsForShoreline(): List<JacksonGeoJsonObject> = geoJsonObjectsForShoreline
 
     fun isPositionNavigable(position: LatLongPosition): Boolean =
-        geoJsonObject.accept(IsNavigableVisitor(position.toLngLatAlt()))
+        geoJsonObjectsForShoreline.all{ it.accept(IsNavigableVisitor(position.toLngLatAlt())) }
 
     override fun makePosition(vararg coordinates: Number): GeoPosition {
         require(coordinates.size == 2) { javaClass.simpleName + " only supports bi-dimensional coordinates (latitude, longitude)" }
@@ -63,8 +65,11 @@ MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironme
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
         other as NavigationEnvironment<*>
-        return path == other.path
+        if (geoJsonObjectsForShoreline != other.geoJsonObjectsForShoreline) return false
+        if (geoJsonObjectsForRoutes != other.geoJsonObjectsForRoutes) return false
+        return true
     }
 
-    override fun hashCode(): Int = path.hashCode()
+    override fun hashCode(): Int =  geoJsonObjectsForShoreline.hashCode() * geoJsonObjectsForRoutes.hashCode()
+
 }
