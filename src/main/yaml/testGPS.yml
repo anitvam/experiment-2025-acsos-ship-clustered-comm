@@ -13,7 +13,13 @@ _pools:
         actions:
           - type: ReproduceGPSTrace
             parameters: [0.005, "navigation-routes", false, "AlignToSimulationTime"]
-
+      - time-distribution:
+          type: Trigger
+          parameters: [ 0 ]
+        type: Event
+        actions:
+          - type: LoadIdFromTrace
+            parameters: [ "navigation-routes" ]
 deployments:
   - type: FromGPSTrace
     parameters:
