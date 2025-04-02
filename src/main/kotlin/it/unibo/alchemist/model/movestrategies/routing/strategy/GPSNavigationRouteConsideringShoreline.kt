@@ -10,13 +10,17 @@ import it.unibo.alchemist.model.movestrategies.RoutingStrategy
 import it.unibo.alchemist.model.routes.PolygonalChain
 
 class GPSNavigationRouteConsideringShoreline<T, O : RoutingServiceOptions<O>, S : RoutingService<GeoPosition, O>>(
-    environment: MapEnvironment<T, O, S>
+    val environment: MapEnvironment<T, O, S>
 ): RoutingStrategy<T, GeoPosition> {
     init {
         require(environment is NavigationEnvironment<T>)
-        println("Using custom implementation for GPSNavigationRouteConsideringShoreline")
+
+        //println("Using custom implementation for GPSNavigationRouteConsideringShoreline")
     }
     override fun computeRoute(currentPos: GeoPosition, finalPos: GeoPosition): Route<GeoPosition> {
-        return PolygonalChain(currentPos, finalPos)
+        println("going to: $finalPos")
+        val pippo = PolygonalChain(currentPos, finalPos)
+        //println(pippo)
+        return pippo
     }
 }

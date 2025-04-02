@@ -23,6 +23,9 @@ class NavigationEnvironment<T>(
      routesFiles: List<String>,
 ) : MapEnvironment<T, GraphHopperOptions, GraphHopperRoutingService> by OSMEnvironment(incarnation){
 
+    constructor(incarnation: Incarnation<T, GeoPosition>, shorelineFiles: List<String>):
+        this(incarnation, shorelineFiles, emptyList())
+
     // Loading
     private val geoJsonObjectsForShoreline: List<JacksonGeoJsonObject> = shorelineFiles.map { deserializeGeoJSON(it) }
     private val geoJsonObjectsForRoutes: List<JacksonGeoJsonObject> = routesFiles.map { deserializeGeoJSON(it) }

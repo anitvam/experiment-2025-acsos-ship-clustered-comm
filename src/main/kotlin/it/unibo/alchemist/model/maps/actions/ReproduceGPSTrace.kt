@@ -13,7 +13,6 @@ import it.unibo.alchemist.model.maps.MapEnvironment
 import it.unibo.alchemist.model.maps.movestrategies.routing.IgnoreStreets
 import it.unibo.alchemist.model.maps.movestrategies.speed.StraightLineTraceDependantSpeed
 import it.unibo.alchemist.model.maps.movestrategies.target.FollowTrace
-import it.unibo.alchemist.model.movestrategies.routing.strategy.GPSNavigationRouteConsideringShoreline
 import it.unibo.alchemist.model.movestrategies.speed.ConstantSpeed
 
 /**
@@ -42,17 +41,17 @@ class ReproduceGPSTrace<T, O : RoutingServiceOptions<O>, S : RoutingService<GeoP
      * Args to build normalize
      */
     constructor(
-        environment: MapEnvironment<T?, O, S>,
-        node: Node<T?>,
-        reaction: Reaction<T?>,
+        environment: MapEnvironment<T, O, S>,
+        node: Node<T>,
+        reaction: Reaction<T>,
         path: String,
         cycle: Boolean,
-        normalizer: String?,
-        vararg normalizerArgs: Any?
+        normalizer: String,
+        vararg normalizerArgs: Any
     ) : super(
         environment, node,
         IgnoreStreets<T, GeoPosition>(),
-        StraightLineTraceDependantSpeed<T?, O, S>(environment, node, reaction),
+        StraightLineTraceDependantSpeed<T, O, S>(environment, node, reaction),
         FollowTrace<T>(reaction),
         path, cycle, normalizer, *normalizerArgs
     )
@@ -80,17 +79,17 @@ class ReproduceGPSTrace<T, O : RoutingServiceOptions<O>, S : RoutingService<GeoP
     constructor(
         environment: MapEnvironment<T, O, S>,
         node: Node<T>,
-        reaction: Reaction<T?>?,
+        reaction: Reaction<T>,
         speed: Double,
         path: String,
         cycle: Boolean,
-        normalizer: String?,
-        vararg normalizerArgs: Any?
+        normalizer: String,
+        vararg normalizerArgs: Any
     ) : super(
         environment,
         node,
-        //IgnoreStreets<T, GeoPosition>(),
-        GPSNavigationRouteConsideringShoreline(environment),
+        IgnoreStreets<T, GeoPosition>(),
+        //GPSNavigationRouteConsideringShoreline(environment),
         ConstantSpeed<T, GeoPosition>(reaction, speed),
         FollowTrace<T>(reaction),
         path,
