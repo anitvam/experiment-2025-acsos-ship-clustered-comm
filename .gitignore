@@ -1,10 +1,18 @@
+#########################
+#### PROJECT IGNORES ####
+
+# Ignore GPS data routes
+src/main/resources/navigation-routes/**
+
+# Ignore raw data
+src/main/resources/raw
+
+#########################
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Ignore GPS data routes
-src/main/resources/navigation-routes/**
 
 # Intellij Data
 .idea/
