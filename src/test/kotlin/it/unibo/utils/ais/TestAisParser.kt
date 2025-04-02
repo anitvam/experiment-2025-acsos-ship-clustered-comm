@@ -64,24 +64,7 @@ class TestAisParser {
         )
     }
 
-    @Test
-    fun parseDayData() {
-        val aisMessages: MutableMap<Instant, AisMessage> = mutableMapOf()
-        dataToParse.forEach {
-            aisMessages.putAll(AisDecoder.parseFile(it))
-        }
-        val aisPayloads = AisPayload.from(aisMessages)
-        GpxFormatter.createGpxFileFromAisData(aisPayloads, outputXmlPath)
-    }
-
     companion object {
-
-        val dataToParse: List<File> = File("/home/anitvam/work/experiments/202208").listFiles { file ->
-            Pattern.compile("20220818.+").matcher(file.name).matches()
-        }.ifEmpty { throw IllegalStateException("No suitable file found") }.toList()
-
-        val outputXmlPath = File("/home/anitvam/work/experiments/aggreg_colav/src/main/resources/navigation-routes")
-
         @JvmStatic
         @BeforeAll
         fun checkFilesExist(): Unit {

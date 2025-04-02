@@ -50,6 +50,20 @@ dependencies {
     }
 }
 
+val createGpxRoutes by tasks.register<JavaExec>("createGpxRoutes") {
+    group = alchemistGroupGraphic
+    description = "Creates GPX routes given the raw AIS data"
+    val resources = "src/main/resources"
+    val inputFolder = "$resources/raw/202208" // August 2022
+    val selectedDay = "20220818" // 18 August 2022
+    val outputFolder = "$resources/navigation-routes"
+    inputs.dir(layout.projectDirectory.dir(inputFolder))
+    outputs.dir(layout.projectDirectory.dir(outputFolder))
+    mainClass.set("it.unibo.util.gpx.ParseRawNavigationData")
+    classpath = sourceSets["main"].runtimeClasspath
+    args(inputFolder, outputFolder, selectedDay)
+}
+
 // Heap size estimation for batches
 val maxHeap: Long? by project
 val heap: Long = maxHeap ?: if (System.getProperty("os.name").lowercase().contains("linux")) {
@@ -105,6 +119,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             description = "Launches graphic simulation ${it.nameWithoutExtension}"
             mainClass.set("it.unibo.alchemist.Alchemist")
             classpath = sourceSets["main"].runtimeClasspath
+            dependsOn(createGpxRoutes)
             args("run", it.absolutePath)
             javaLauncher.set(
                 javaToolchains.launcherFor {
