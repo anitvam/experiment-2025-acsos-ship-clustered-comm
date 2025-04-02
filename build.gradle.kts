@@ -33,6 +33,12 @@ sourceSets {
             srcDir("src/main/yaml")
         }
     }
+    test {
+        resources {
+            srcDir("src/main/resources")
+
+        }
+    }
 }
 
 tasks.test {
