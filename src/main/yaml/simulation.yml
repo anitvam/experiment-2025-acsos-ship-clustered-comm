@@ -36,10 +36,11 @@ _pools:
           - type: LoadIdFromTrace
             parameters: [ "navigation-routes" ]
 deployments:
-  - type: FromGPSTrace
+  - type: FromGPSTraceCustom
     parameters:
-      - "navigation-routes" # Folder containing GPS traces
-      - "AlignToSimulationTime"
+      path: "navigation-routes" # Folder containing GPS traces
+      normalizer: "AlignToSimulationTime"
+      normalizerArgs: []
     programs:
       - *move
       - *program

@@ -1,6 +1,5 @@
 package it.unibo.util.geojson
 
-import io.data2viz.geojson.GeoJsonObject
 import io.data2viz.geojson.jackson.*
 import it.unibo.alchemist.boundary.ui.api.Wormhole2D
 import it.unibo.alchemist.model.GeoPosition
@@ -11,13 +10,13 @@ class DrawPoligonVisitor(
     val wormhole2D: Wormhole2D<GeoPosition>,
 ): GeoJsonObjectVisitor<Unit> {
 
-    override fun visit(point: Point) {
-        val viewP = wormhole2D.getViewPoint(point.coordinates.toLatLongPosition());
+    override fun visit(geoJsonObject: Point) {
+        val viewP = wormhole2D.getViewPoint(geoJsonObject.coordinates.toLatLongPosition());
         graphics2D.fillOval(viewP.x - 2, viewP.y - 2, 4, 4)
     }
 
-    override fun visit(lineString: LineString) {
-        val coordinates = lineString.coordinates
+    override fun visit(geoJsonObject: LineString) {
+        val coordinates = geoJsonObject.coordinates
         for (i in 0 until coordinates.size - 1) {
             val viewP1 = wormhole2D.getViewPoint(coordinates[i].toLatLongPosition());
             val viewP2 = wormhole2D.getViewPoint(coordinates[i+1].toLatLongPosition());
@@ -26,8 +25,8 @@ class DrawPoligonVisitor(
         }
     }
 
-    override fun visit(polygon: Polygon) {
-        val coordinates = polygon.coordinates.first()
+    override fun visit(geoJsonObject: Polygon) {
+        val coordinates = geoJsonObject.coordinates.first()
         val n = coordinates.size
         val xPoints = IntArray(n)
         val yPoints = IntArray(n)
@@ -41,35 +40,35 @@ class DrawPoligonVisitor(
         graphics2D.drawPolygon(xPoints, yPoints, n)
     }
 
-    override fun visit(multiPoint: MultiPoint) {
-        multiPoint.accept(this)
+    override fun visit(geoJsonObject: MultiPoint) {
+        geoJsonObject.accept(this)
     }
 
-    override fun visit(multiLineString: MultiLineString) {
-        multiLineString.accept(this)
+    override fun visit(geoJsonObject: MultiLineString) {
+        geoJsonObject.accept(this)
     }
 
-    override fun visit(multiPolygon: MultiPolygon) {
-        multiPolygon.asListOfPoligon().map {
+    override fun visit(geoJsonObject: MultiPolygon) {
+        geoJsonObject.asListOfPoligon().map {
             it.accept(this)
         }
     }
 
-    override fun visit(geometryCollection: GeometryCollection) {
-        geometryCollection.getGeometries().map {
+    override fun visit(geoJsonObject: GeometryCollection) {
+        geoJsonObject.getGeometries().map {
             it.accept(this)
         }
     }
 
-    override fun visit(featureCollection: FeatureCollection) {
-        featureCollection.getFeatures().map {
+    override fun visit(geoJsonObject: FeatureCollection) {
+        geoJsonObject.getFeatures().map {
             it.accept(this)
         }
     }
 
-    override fun visit(feature: Feature) {
-        if (feature.geometry != null) {
-            feature.geometry!!.accept(this)
+    override fun visit(geoJsonObject: Feature) {
+        if (geoJsonObject.geometry != null) {
+            geoJsonObject.geometry!!.accept(this)
         }
     }
 }

@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport
 /**
  * Distributes nodes in the first positions of [GPSTrace].
  */
-class FromGPSTrace(
+class FromGPSTraceCustom(
     nodeCount: Int,
     path: String,
     cycle: Boolean,
@@ -52,14 +52,14 @@ class FromGPSTrace(
         this.numNode = nodeCount
     }
 
-    constructor(path: String, normalizer: String, vararg args: Any): this(
+    constructor(path: String, normalizer: String, vararg normalizerArgs: Any): this(
         File(
             object {}.javaClass.classLoader.getResource(path)?.toURI() ?: throw IllegalArgumentException("File not found: $path")
         ).listFiles()?.size ?: throw IllegalArgumentException("Folder is empty: $path"),
         path,
         false,
         normalizer,
-        args
+        normalizerArgs
     )
 
     override fun stream(): Stream<GeoPosition> {

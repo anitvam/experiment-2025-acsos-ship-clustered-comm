@@ -1,7 +1,7 @@
 [versions]
-kotlin = "2.1.0"
-alchemist = "37.1.5"
-collektive = "12.3.1"
+kotlin = "2.1.20"
+alchemist = "42.0.5"
+collektive = "18.0.0"
 aislib = "2.8.4"
 
 [libraries]
