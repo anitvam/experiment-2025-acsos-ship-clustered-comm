@@ -56,18 +56,19 @@ dependencies {
     }
 }
 
-val createGpxRoutes by tasks.register<JavaExec>("createGpxRoutes") {
+val createGpxRoutes by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.withType<KotlinCompile>())
     group = alchemistGroupGraphic
     description = "Creates GPX routes given the raw AIS data"
     val resources = "ais-data"
     val inputFolder = "$resources/raw/202208" // August 2022
     val selectedDay = "20220818" // 18 August 2022
-    val outputFolder = "${layout.buildDirectory}/resources/main/navigation-routes"
+    val outputFolder = layout.buildDirectory.map { it.asFile.resolve("resources/main/navigation-routes") }
     inputs.dir(file(inputFolder))
-    outputs.dir(file(outputFolder))
+    outputs.dir(outputFolder)
     mainClass.set("it.unibo.util.gpx.ParseRawNavigationData")
     classpath = sourceSets["main"].runtimeClasspath
-    args(inputFolder, outputFolder, selectedDay)
+    args(inputFolder, outputFolder.get().absolutePath, selectedDay)
 }
 
 // Heap size estimation for batches

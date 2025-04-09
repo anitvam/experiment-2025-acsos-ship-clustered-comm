@@ -23,7 +23,9 @@ object ParseRawNavigationData {
         val aisPayloads = AisPayload.from(aisMessages)
             .filterNot { it.boatId == 235818393 } // This boat is located in Russia somehow. Deleting from dataset.
         println("Writing to: $outputFolder")
-        GpxFormatter.createGpxFileFromAisData(aisPayloads, File(outputFolder))
+        val destinationFolder = File(outputFolder)
+        destinationFolder.mkdirs()
+        GpxFormatter.createGpxFileFromAisData(aisPayloads, destinationFolder)
     }
 
     @JvmStatic
