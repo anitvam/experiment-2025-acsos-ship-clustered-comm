@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.20"
 alchemist = "42.0.5"
-collektive = "18.0.0"
+collektive = "20.2.1"
 aislib = "2.8.4"
 
 [libraries]
