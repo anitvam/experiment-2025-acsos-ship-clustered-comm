@@ -5,7 +5,7 @@
 src/main/resources/navigation-routes/**
 
 # Ignore raw data
-src/main/resources/raw
+ais-data/**
 
 #########################
 
