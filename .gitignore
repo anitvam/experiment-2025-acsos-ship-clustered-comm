@@ -218,3 +218,4 @@ _version.py
 -mypy_cache/
 .mypy_cache/
 
+node_modules/
