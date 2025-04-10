@@ -1,30 +1,42 @@
 package it.unibo.collektive.examples.gradient
 
-import com.fasterxml.jackson.databind.module.SimpleModule
 import it.unibo.alchemist.collektive.device.CollektiveDevice
-import it.unibo.alchemist.collektive.device.DistanceSensor
 import it.unibo.alchemist.model.GeoPosition
-import it.unibo.alchemist.model.maps.positions.LatLongPosition
-import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
-import it.unibo.collektive.alchemist.device.sensors.EnvironmentVariables
+import it.unibo.collektive.aggregate.api.neighboring
+import it.unibo.collektive.field.operations.minWithId
 import it.unibo.collektive.stdlib.consensus.boundedElection
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import kotlin.Double.Companion.POSITIVE_INFINITY
+
+
+private typealias RelayInfo<ID> = Pair<ID, Double>
+private fun <ID> RelayInfo<ID>.relayId(): ID = first
+private val RelayInfo<*>.distanceToLeader: Double get() = second
+
 
 /**
  * The entrypoint of the simulation running a gradient.
  */
 fun Aggregate<Int>.gradientEntrypoint(
-    environment: CollektiveDevice<GeoPosition>,
-    distanceSensor: DistanceSensor,
+    environment: CollektiveDevice<GeoPosition>
 ): Double {
-    val groundStation: Boolean = environment["station"]
-    val metric = with(environment) { distances() }
+    fun <T> T.inject(name: String) = also { environment[name] = this }
+    val groundStation: Boolean = environment["source"]
+    val metric = with(environment) { distances() } // TODO: convert this to data rate
+    val distanceToShore: Double = distanceTo(groundStation, metric = metric).inject("distanceToShore")
     val myLeader = boundedElection(
-        strength = if (groundStation) POSITIVE_INFINITY else 0.0,
+        strength = -distanceToShore,
         bound = 5000.0,
         metric = metric,
-    )
-    return myLeader.toDouble()
+    ).inject("myLeader")
+    val distanceToLeader = distanceTo(localId == myLeader, metric = metric).inject("distanceToLeader")
+    val potentialRelays = neighboring(myLeader).map { it != myLeader }.inject("potentialRelays")
+    val myRelay = potentialRelays.alignedMap(neighboring(distanceToLeader)) { canRelay, distance ->
+        when {
+            canRelay -> distance
+            else -> POSITIVE_INFINITY
+        }
+    }.minWithId(localId to POSITIVE_INFINITY, compareBy { it.distanceToLeader }).relayId().inject("myRelay")
+    return metric[myRelay]
 }
