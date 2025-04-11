@@ -58,8 +58,6 @@ deployments:
     programs:
       - *program
     contents:
-      - molecule: source
-        concentration: true
       - molecule: station
         concentration: true
   - type: SpecificPositions # Vodafone.de 5G antenna approx position taken from opensource data (cellmapper.net)
@@ -87,8 +85,10 @@ deployments:
       - [54.473953, 9.835990] #2212896
       - [54.494095, 9.860919] #1226
       - [54.582523, 10.016081] #2210141
+    programs:
+      - *program
     contents:
-      - molecule: station5g
+      - molecule: 5gAntenna
         concentration: true
 terminate:
   type: StableForSteps

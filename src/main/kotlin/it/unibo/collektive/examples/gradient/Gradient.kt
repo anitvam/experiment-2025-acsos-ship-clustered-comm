@@ -6,11 +6,13 @@ import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.any
+import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.minWithId
 import it.unibo.collektive.stdlib.consensus.boundedElection
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import javax.xml.crypto.Data
 import kotlin.Double.Companion.POSITIVE_INFINITY
+import kotlin.compareTo
 import kotlin.math.exp
 import kotlin.math.ln
 
@@ -19,7 +21,6 @@ private typealias RelayInfo<ID> = Pair<ID, Double>
 private fun <ID> RelayInfo<ID>.relayId(): ID = first
 private val RelayInfo<*>.distanceToLeader: Double get() = second
 
-
 /**
  * The entrypoint of the simulation running a gradient.
  */
@@ -27,9 +28,20 @@ fun Aggregate<Int>.gradientEntrypoint(
     environment: CollektiveDevice<GeoPosition>
 ): Any? {
     fun <T> T.inject(name: String) = also { environment[name] = this }
-    val groundStation: Boolean = environment["source"]
-    val metric: Field<Int, Double> = with(environment) { distances() } // TODO: convert this to data rate
-        .inject("metric")
+    val groundStation: Boolean = environment.isDefined("station")
+    val distances: Field<Int, Distance> = with(environment) { distances() }.map { it.meters }
+        .inject("distance")
+    val is5G: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
+    val dataRates = distances.alignedMapWithId(is5G) { id, distance, tower ->
+        when {
+            id == localId -> DataRate(POSITIVE_INFINITY)
+            tower || is5G.localValue -> midband5G(distance)
+            else -> maxOf(lora(distance), wifi(distance), aprs(distance))
+        }
+    }.inject("data rates")
+    dataRates.max(0.kiloBitsPerSecond).inject("max data rate")
+    val metric = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
+    val streamingBitRate = 3.megaBitsPerSecond
 //    val distance = distanceTo(groundStation, metric = metric).inject("toSource")
 //    return convergeCast(
 //        local = listOf(localId),
@@ -38,8 +50,8 @@ fun Aggregate<Int>.gradientEntrypoint(
 //    ).inject("ids").size
     val distanceToShore: Double = distanceTo(groundStation, metric = metric).inject("distanceToShore")
     val myLeader = boundedElection(
-        strength = -distanceToShore, // TODO
-        bound = 5000.0,
+        strength = -distanceToShore,
+        bound = streamingBitRate.timeToTransmitOneMb,
         metric = metric,
     ).inject("myLeader")
     val distanceToLeader = distanceTo(localId == myLeader, metric = metric).inject("distanceToLeader")
@@ -73,33 +85,38 @@ fun Aggregate<Int>.gradientEntrypoint(
 //}
 
 @JvmInline
-value class Distance(val meters: Double) {
+value class Distance(val meters: Double)  : Comparable<Distance> {
     val kilometers: Double get() = meters / 1000.0
 
     override fun toString(): String = when {
         meters > 1000 -> "${kilometers}km"
         else -> "${meters}m"
     }
+
+    override fun compareTo(other: Distance): Int = meters.compareTo(other.meters)
 }
 val Double.meters get() = Distance(this)
 val Double.kilometers get() = Distance(this * 1e3)
 val Int.meters get() = toDouble().meters
 val Int.kilometers get() = toDouble().kilometers
 
-
 @JvmInline
-value class DataRate(val kiloBitsPerSecond: Double) {
+value class DataRate(val kiloBitsPerSecond: Double) : Comparable<DataRate> {
     val megaBitsPerSecond: Double get() = kiloBitsPerSecond / 1000.0
     val gigaBitsPerSecond: Double get() = megaBitsPerSecond / 1000.0
 
-    val timeToTransmitOneKb: Double
-        get() = 1.0 / kiloBitsPerSecond
+    val timeToTransmitOneKb: Double get() = 1.0 / kiloBitsPerSecond
+
+    val timeToTransmitOneMb get() = timeToTransmitOneKb * 1e3
 
     override fun toString(): String = when {
+        kiloBitsPerSecond.isInfinite() -> "loopback interface"
         gigaBitsPerSecond > 1 -> "${gigaBitsPerSecond}Gbps"
         megaBitsPerSecond > 1 -> "${megaBitsPerSecond}Mbps"
         else -> "${kiloBitsPerSecond}Kbps"
     }
+
+    override fun compareTo(other: DataRate) = kiloBitsPerSecond.compareTo(other.kiloBitsPerSecond)
 }
 
 val Double.kiloBitsPerSecond get() = DataRate(this)
