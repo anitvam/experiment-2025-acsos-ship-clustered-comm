@@ -9,10 +9,9 @@ import it.unibo.collektive.field.operations.any
 import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.minWithId
 import it.unibo.collektive.stdlib.consensus.boundedElection
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import it.unibo.collektive.stdlib.spreading.distanceTo
-import javax.xml.crypto.Data
 import kotlin.Double.Companion.POSITIVE_INFINITY
-import kotlin.compareTo
 import kotlin.math.exp
 import kotlin.math.ln
 
@@ -31,39 +30,53 @@ fun Aggregate<Int>.gradientEntrypoint(
     val groundStation: Boolean = environment.isDefined("station")
     val distances: Field<Int, Distance> = with(environment) { distances() }.map { it.meters }
         .inject("distance")
-    val is5G: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
-    val dataRates = distances.alignedMapWithId(is5G) { id, distance, tower ->
+    val is5gAntenna: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
+    val thisIsA5gAntenna = is5gAntenna.localValue
+    val dataRate5g = distances.alignedMapWithId(is5gAntenna) { id, distance, neighborIs5g ->
         when {
-            id == localId -> DataRate(POSITIVE_INFINITY)
-            tower || is5G.localValue -> midband5G(distance)
-            else -> maxOf(lora(distance), wifi(distance), aprs(distance))
+            id == localId -> loopBack
+            neighborIs5g && thisIsA5gAntenna -> 10.gigaBitsPerSecond // 5g towers with fiber backhaul
+            neighborIs5g || thisIsA5gAntenna -> midband5G(distance)
+            else -> disconnected
         }
-    }.inject("data rates")
-    dataRates.max(0.kiloBitsPerSecond).inject("max data rate")
-    val metric = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
-    val streamingBitRate = 3.megaBitsPerSecond
-//    val distance = distanceTo(groundStation, metric = metric).inject("toSource")
-//    return convergeCast(
-//        local = listOf(localId),
-//        potential = distance,
-//        accumulateData = { x, y -> x + y }
-//    ).inject("ids").size
-    val distanceToShore: Double = distanceTo(groundStation, metric = metric).inject("distanceToShore")
-    val myLeader = boundedElection(
-        strength = -distanceToShore,
-        bound = streamingBitRate.timeToTransmitOneMb,
-        metric = metric,
-    ).inject("myLeader")
-    val distanceToLeader = distanceTo(localId == myLeader, metric = metric).inject("distanceToLeader")
-    val potentialRelays = neighboring(myLeader).map { it != myLeader }.inject("potentialRelays")
-    val myRelay = potentialRelays.alignedMap(neighboring(distanceToLeader)) { canRelay, distance ->
-        when {
-            canRelay -> distance
-            else -> POSITIVE_INFINITY
+    }.inject("5g data rates").max(base = disconnected).inject("5g data rate")
+    // Once data rates have been established, 5g towers are cut off the computation, they just relay the communication
+    if (!thisIsA5gAntenna) { //
+        val dataRates = distances.mapWithId { id, distanceToNeighbor ->
+            when {
+                id == localId -> loopBack
+                else -> maxOf(lora(distanceToNeighbor), wifi(distanceToNeighbor), aprs(distanceToNeighbor), dataRate5g)
+            }
+        }.inject("data rates")
+        dataRates.max(base = disconnected).inject("max data rate")
+        val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
+        val streamingBitRate = 3.megaBitsPerSecond
+        val timeToStation: Double = distanceTo(groundStation, metric = timeToTransmit).inject("timeToStation")
+        val myLeader = boundedElection(
+            strength = -timeToStation,
+            bound = streamingBitRate.timeToTransmitOneMb,
+            metric = timeToTransmit,
+        ).inject("myLeader")
+        val imLeader = myLeader == localId
+        imLeader.inject("imLeader")
+        val distanceToLeader = distanceTo(imLeader, metric = timeToTransmit).inject("distanceToLeader")
+        val potentialRelays = neighboring(myLeader).map { it != myLeader }.inject("potentialRelays")
+        val myRelay = potentialRelays.alignedMap(timeToStation + timeToTransmit) { canRelay, distance ->
+            when {
+                canRelay -> distance
+                else -> POSITIVE_INFINITY
+            }
+        }.minWithId(localId to POSITIVE_INFINITY, compareBy { it.distanceToLeader }).relayId().inject("myRelay")
+        val imRelay = neighboring(myRelay).map { it == localId }.any(false).inject("imRelay")
+        val upstreamToRelay = dataRates[myRelay]
+        val iHaveARelay = imLeader && myRelay != localId
+        environment["upstream-data-rate"] = when {
+            iHaveARelay -> upstreamToRelay
+            else -> 0.kiloBitsPerSecond
         }
-    }.minWithId(localId to POSITIVE_INFINITY, compareBy { it.distanceToLeader }).relayId().inject("myRelay")
-    val imRelay = neighboring(myRelay).map { it == localId }.any(false).inject("imRelay")
-    return metric[myRelay]
+        return timeToTransmit[myRelay]
+    }
+    return Unit
 }
 
 //fun main() {
@@ -89,8 +102,8 @@ value class Distance(val meters: Double)  : Comparable<Distance> {
     val kilometers: Double get() = meters / 1000.0
 
     override fun toString(): String = when {
-        meters > 1000 -> "${kilometers}km"
-        else -> "${meters}m"
+        meters > 1000 -> "${kilometers.readable}km"
+        else -> "${meters.readable}m"
     }
 
     override fun compareTo(other: Distance): Int = meters.compareTo(other.meters)
@@ -99,6 +112,7 @@ val Double.meters get() = Distance(this)
 val Double.kilometers get() = Distance(this * 1e3)
 val Int.meters get() = toDouble().meters
 val Int.kilometers get() = toDouble().kilometers
+val Double.readable get() = String.format("%.3f", this)
 
 @JvmInline
 value class DataRate(val kiloBitsPerSecond: Double) : Comparable<DataRate> {
@@ -110,15 +124,17 @@ value class DataRate(val kiloBitsPerSecond: Double) : Comparable<DataRate> {
     val timeToTransmitOneMb get() = timeToTransmitOneKb * 1e3
 
     override fun toString(): String = when {
-        kiloBitsPerSecond.isInfinite() -> "loopback interface"
-        gigaBitsPerSecond > 1 -> "${gigaBitsPerSecond}Gbps"
-        megaBitsPerSecond > 1 -> "${megaBitsPerSecond}Mbps"
-        else -> "${kiloBitsPerSecond}Kbps"
+        kiloBitsPerSecond.isInfinite() -> "loopback"
+        gigaBitsPerSecond > 1 -> "${gigaBitsPerSecond.readable}Gbps"
+        megaBitsPerSecond > 1 -> "${megaBitsPerSecond.readable}Mbps"
+        else -> "${kiloBitsPerSecond.readable}Kbps"
     }
 
     override fun compareTo(other: DataRate) = kiloBitsPerSecond.compareTo(other.kiloBitsPerSecond)
 }
 
+val disconnected = DataRate(0.0)
+val loopBack = DataRate(Double.POSITIVE_INFINITY)
 val Double.kiloBitsPerSecond get() = DataRate(this)
 val Double.megaBitsPerSecond get() = DataRate(this * 1e3)
 val Double.gigaBitsPerSecond get() = DataRate(this * 1e6)
@@ -142,7 +158,6 @@ val wifi = ConnectionTechnology.byInterpolation(
         70.meters to 120.megaBitsPerSecond,
         80.meters to 80.megaBitsPerSecond,
         90.meters to 40.megaBitsPerSecond,
-        10.meters to 10.megaBitsPerSecond,
         120.meters to 1.bitsPerSecond,
     )
 )
@@ -158,7 +173,7 @@ val midband5G = ConnectionTechnology.byInterpolation(
         3.kilometers to 150.megaBitsPerSecond,
         3.5.kilometers to 110.megaBitsPerSecond,
         4.kilometers to 50.megaBitsPerSecond,
-        5.5.kilometers to 1.bitsPerSecond,
+        5.kilometers to 5.megaBitsPerSecond,
     )
 )
 
@@ -171,7 +186,6 @@ val aprs = ConnectionTechnology.byInterpolation(
         30.kilometers to 4000.bitsPerSecond,
         40.kilometers to 2000.bitsPerSecond,
         50.kilometers to 1000.bitsPerSecond,
-        60.kilometers to 1.bitsPerSecond,
     )
 )
 
@@ -181,9 +195,13 @@ fun interface ConnectionTechnology {
     companion object {
         fun byInterpolation(
             dataRates: Map<Distance, DataRate>,
+            maxRange: Distance = dataRates.keys.max(),
         ): ConnectionTechnology = object : ConnectionTechnology {
             val interpolated = interpolateLogLinear(dataRates)
-            override fun invoke(distance: Distance): DataRate = interpolated(distance)
+            override fun invoke(distance: Distance): DataRate = when {
+                distance > maxRange -> disconnected
+                else -> interpolated(distance)
+            }
         }
     }
 }
