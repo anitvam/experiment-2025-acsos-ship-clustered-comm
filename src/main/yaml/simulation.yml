@@ -47,8 +47,14 @@ deployments:
     contents:
       - molecule: source
         concentration: false
-  - type: Point
-    parameters: [54.427794, 10.313027]
+  - type: SpecificPositions
+    parameters:
+      - [ 54.26, 9.63 ] # Rendsburg, Germany
+      - [ 54.36, 10.07 ] # Kiel-Suchsdorf, Germany
+      - [ 54.33, 10.08 ] # Kiel-2, Germany
+      - [ 54.37, 10.12 ] # Kiel, Germany
+      - [ 54.39, 10.18 ] # Friedrichsort, Germany
+      - [ 54.81, 11.14 ] # Island Brigge, Denmark
     programs:
       - *program
     contents:
