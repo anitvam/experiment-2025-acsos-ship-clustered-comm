@@ -1,11 +1,71 @@
 [
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShoreline",
-    "markerNodeID": 256
+    "markerNodeID": 6
   },
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawRoutes",
-    "markerNodeID": 256
+    "markerNodeID": 6
+  },
+  {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
+    "curIncarnation": "collektive",
+    "mode": "FILL_ELLIPSE",
+    "red": {
+      "max": 255,
+      "min": 0,
+      "val": 0
+    },
+    "blue": {
+      "max": 255,
+      "min": 0,
+      "val": 0
+    },
+    "green": {
+      "max": 255,
+      "min": 0,
+      "val": 0
+    },
+    "alpha": {
+      "max": 255,
+      "min": 0,
+      "val": 255
+    },
+    "scaleFactor": {
+      "max": 100,
+      "min": 0,
+      "val": 50
+    },
+    "size": {
+      "max": 100,
+      "min": 0,
+      "val": 37
+    },
+    "molFilter": true,
+    "molString": "myLeader",
+    "molPropertyFilter": true,
+    "property": "if (localId.toInt() \u003d\u003d it.toInt()) 1 else 0",
+    "writingPropertyValue": true,
+    "c": "ALPHA",
+    "reverse": false,
+    "propoom": {
+      "max": 10,
+      "min": -10,
+      "val": 0
+    },
+    "minprop": {
+      "max": 10,
+      "min": -10,
+      "val": 0
+    },
+    "maxprop": {
+      "max": 10,
+      "min": -10,
+      "val": 1
+    },
+    "colorCache": {
+      "value": -16777216
+    }
   },
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
@@ -42,7 +102,7 @@
       "val": 19
     },
     "molFilter": true,
-    "molString": "it.unibo.collektive.examples.gradient.GradientKt.gradientEntrypoint",
+    "molString": "myLeader",
     "molPropertyFilter": true,
     "property": "it",
     "writingPropertyValue": true,
@@ -61,7 +121,7 @@
     "maxprop": {
       "max": 10,
       "min": -10,
-      "val": 3
+      "val": 5
     },
     "colorCache": {
       "value": -26532
@@ -74,17 +134,17 @@
     "red": {
       "max": 255,
       "min": 0,
-      "val": 255
+      "val": 0
     },
     "blue": {
       "max": 255,
       "min": 0,
-      "val": 255
+      "val": 0
     },
     "green": {
       "max": 255,
       "min": 0,
-      "val": 255
+      "val": 0
     },
     "alpha": {
       "max": 255,
@@ -112,66 +172,6 @@
       "max": 10,
       "min": -10,
       "val": 3
-    },
-    "minprop": {
-      "max": 10,
-      "min": -10,
-      "val": 0
-    },
-    "maxprop": {
-      "max": 10,
-      "min": -10,
-      "val": 10
-    },
-    "colorCache": {
-      "value": -1
-    }
-  },
-  {
-    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
-    "curIncarnation": "collektive",
-    "mode": "FILL_ELLIPSE",
-    "red": {
-      "max": 255,
-      "min": 0,
-      "val": 0
-    },
-    "blue": {
-      "max": 255,
-      "min": 0,
-      "val": 0
-    },
-    "green": {
-      "max": 255,
-      "min": 0,
-      "val": 0
-    },
-    "alpha": {
-      "max": 255,
-      "min": 0,
-      "val": 255
-    },
-    "scaleFactor": {
-      "max": 100,
-      "min": 0,
-      "val": 50
-    },
-    "size": {
-      "max": 100,
-      "min": 0,
-      "val": 5
-    },
-    "molFilter": false,
-    "molString": "",
-    "molPropertyFilter": false,
-    "property": "",
-    "writingPropertyValue": false,
-    "c": "ALPHA",
-    "reverse": false,
-    "propoom": {
-      "max": 10,
-      "min": -10,
-      "val": 0
     },
     "minprop": {
       "max": 10,

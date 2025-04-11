@@ -1,7 +1,8 @@
 [versions]
+arrow = "2.0.1"
 kotlin = "2.1.20"
 alchemist = "42.0.5"
-collektive = "20.2.3"
+collektive = "21.0.0"
 aislib = "2.8.4"
 
 [libraries]
@@ -10,6 +11,7 @@ alchemist-swingui = { module = "it.unibo.alchemist:alchemist-swingui", version.r
 alchemist-ui-tooling = { module = "it.unibo.alchemist:alchemist-ui-tooling", version.ref = "alchemist" }
 alchemist-maps = { module = "it.unibo.alchemist:alchemist-maps", version.ref = "alchemist" }
 alchemist-euclidean-geometry = { module = "it.unibo.alchemist:alchemist-euclidean-geometry", version.ref = "alchemist" }
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 collektive = { module = "it.unibo.collektive:dsl", version.ref = "collektive" }
 collektive-incarnation = { module = "it.unibo.collektive:alchemist-incarnation-collektive", version.ref = "collektive" }
 collektive-plugin = { module = "it.unibo.collektive:compiler-plugin", version.ref = "collektive" }

@@ -8,10 +8,10 @@ incarnation: collektive
 
 network-model:
   type: ConnectWithinDistance
-  parameters: [5000]
+  parameters: [15000]
 
 _pool: &program
-  - time-distribution: 1
+  - time-distribution: 0.1
     type: Event
     actions:
       - type: RunCollektiveProgram
@@ -19,7 +19,7 @@ _pool: &program
 
 _pools:
   - pool: &move
-      - time-distribution: 1
+      - time-distribution: 0.1
         type: Event
         actions:
           - type: ReproduceGPSTrace
