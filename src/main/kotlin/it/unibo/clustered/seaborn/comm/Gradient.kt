@@ -1,4 +1,4 @@
-package it.unibo.collektive.examples.gradient
+package it.unibo.clustered.seaborn.comm
 
 import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.collektive.aggregate.api.Aggregate
@@ -74,7 +74,7 @@ fun Aggregate<Int>.entrypoint(
             metric = timeToTransmit,
             isRiemannianManifold = false,
         ).inject("timeToStation")
-        val myLeader = boundedElection(
+        val myLeader: Int = boundedElection(
             strength = -timeToStation,
             bound = streamingBitRate.timeToTransmitOneMb,
             metric = timeToTransmit,
@@ -89,8 +89,12 @@ fun Aggregate<Int>.entrypoint(
             metric = timeToTransmit,
             isRiemannianManifold = false,
         ).inject("distanceToLeader")
-        val potentialRelays = neighboring(myLeader).map { it != myLeader }.inject("potentialRelays")
         val timesToStationAround = neighboring(timeToStation).inject("timesToStationAround")
+        val localTimeToStation = timesToStationAround.localValue
+        val potentialRelays = neighboring(myLeader)
+            .alignedMap<Double, Boolean>(timesToStationAround) { leader, distance ->
+                leader != myLeader && distance < localTimeToStation
+            }.inject("potentialRelays")
         val myRelay = potentialRelays.alignedMap(timesToStationAround + timeToTransmit) { canRelay, distance ->
             when {
                 canRelay -> distance
@@ -146,7 +150,7 @@ value class DataRate(val kiloBitsPerSecond: Double) : Comparable<DataRate> {
 }
 
 val disconnected = DataRate(0.0)
-val loopBack = DataRate(Double.POSITIVE_INFINITY)
+val loopBack = DataRate(POSITIVE_INFINITY)
 val Double.kiloBitsPerSecond get() = DataRate(this)
 val Double.megaBitsPerSecond get() = DataRate(this * 1e3)
 val Double.gigaBitsPerSecond get() = DataRate(this * 1e6)

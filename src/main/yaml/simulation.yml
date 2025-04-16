@@ -5,6 +5,11 @@ environment:
  #   - ["maps/north_germany_waterways.geojson", "maps/north_germany_waterways3.geojson"]
 
 variables:
+  one-minute-hz: &one-minute-hz
+    formula: 1 / 60
+  update-frequency: &update-frequency
+    type: ArbitraryVariable
+    parameters: [0.5, [*one-minute-hz, 0.1, 0.5, 1.0]]
   5g-probability: &5g-probability
     default: 0.01
     min: 0.0
@@ -18,11 +23,11 @@ network-model:
   parameters: [15000]
 
 _pool: &program
-  - time-distribution: 0.1
+  - time-distribution: 0.5
     program:
       name: "ShipComm"
       code: |
-        import it.unibo.collektive.examples.gradient.*
+        import it.unibo.clustered.seaborn.comm.*
       entrypoint: |
         entrypoint(device)
 
