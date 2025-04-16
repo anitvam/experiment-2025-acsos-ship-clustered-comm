@@ -4,6 +4,13 @@ environment:
     - ["maps/north_germany_coastline.geojson"]
  #   - ["maps/north_germany_waterways.geojson", "maps/north_germany_waterways3.geojson"]
 
+variables:
+  5g-probability: &5g-probability
+    default: 0.01
+    min: 0.0
+    max: 1.0
+    step: 0.1
+
 incarnation: collektive
 
 network-model:
@@ -12,10 +19,12 @@ network-model:
 
 _pool: &program
   - time-distribution: 0.1
-    type: Event
-    actions:
-      - type: RunCollektiveProgram
-        parameters: [it.unibo.collektive.examples.gradient.GradientKt.gradientEntrypoint]
+    program:
+      name: "ShipComm"
+      code: |
+        import it.unibo.collektive.examples.gradient.*
+      entrypoint: |
+        entrypoint(device)
 
 _pools:
   - pool: &move
@@ -45,8 +54,8 @@ deployments:
       - *move
       - *program
     contents:
-      - molecule: source
-        concentration: false
+      - molecule: 5gProbability
+        concentration: *5g-probability
   - type: SpecificPositions
     parameters:
       - [ 54.26, 9.63 ] # Rendsburg, Germany

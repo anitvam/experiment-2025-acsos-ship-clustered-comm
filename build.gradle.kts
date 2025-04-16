@@ -147,7 +147,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
                 "--override",
                 "monitors: { type: SwingGUI, parameters: { graphics: effects/${it.nameWithoutExtension}.json } }",
                 "--override",
-                "launcher: { parameters: { batch: [], autoStart: false } }",
+                "launcher: { parameters: { batch: [], autoStart: true } }",
                 "--verbosity",
                 "error"
             )

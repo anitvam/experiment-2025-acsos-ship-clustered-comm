@@ -1,13 +1,14 @@
 package it.unibo.collektive.examples.gradient
 
 import it.unibo.alchemist.collektive.device.CollektiveDevice
-import it.unibo.alchemist.model.GeoPosition
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
 import it.unibo.collektive.field.operations.any
+import it.unibo.collektive.field.operations.anyWithSelf
 import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.minWithId
+import it.unibo.collektive.stdlib.consensus.Candidacy
 import it.unibo.collektive.stdlib.consensus.boundedElection
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import it.unibo.collektive.stdlib.spreading.distanceTo
@@ -23,8 +24,8 @@ private val RelayInfo<*>.distanceToLeader: Double get() = second
 /**
  * The entrypoint of the simulation running a gradient.
  */
-fun Aggregate<Int>.gradientEntrypoint(
-    environment: CollektiveDevice<GeoPosition>
+fun Aggregate<Int>.entrypoint(
+    environment: CollektiveDevice<*>
 ): Any? {
     fun <T> T.inject(name: String) = also { environment[name] = this }
     val groundStation: Boolean = environment.isDefined("station")
@@ -40,28 +41,57 @@ fun Aggregate<Int>.gradientEntrypoint(
             else -> disconnected
         }
     }.inject("5g data rates").max(base = disconnected).inject("5g data rate")
-    // Once data rates have been established, 5g towers are cut off the computation, they just relay the communication
+    // Once data rates have been established, 5g towers are cut off the computation,
+    // they just relay the communication
     if (!thisIsA5gAntenna) { //
-        val dataRates = distances.mapWithId { id, distanceToNeighbor ->
+        val has5gAntenna = evolve(
+            when (val probability = environment.get<Any?>("5gProbability")) {
+                is Number -> environment.randomGenerator.nextDouble() < probability.toDouble()
+                else -> false
+            }
+        ) { it }.inject("has5gAntenna")
+        val antennasAround = neighboring(has5gAntenna).anyWithSelf { it }
+        val dataRates = distances.mapWithId { id, distance ->
             when {
                 id == localId -> loopBack
-                else -> maxOf(lora(distanceToNeighbor), wifi(distanceToNeighbor), aprs(distanceToNeighbor), dataRate5g)
+                else -> {
+                    val classicDataRates = maxOf(lora(distance), wifi(distance), aprs(distance), dataRate5g)
+                    when {
+                        antennasAround -> {
+                            val shipToShip5G = maxOf(dataRate5g, midband5G(distance))
+                            maxOf(shipToShip5G, classicDataRates)
+                        }
+                        else -> classicDataRates
+                    }
+                }
             }
         }.inject("data rates")
         dataRates.max(base = disconnected).inject("max data rate")
         val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
         val streamingBitRate = 3.megaBitsPerSecond
-        val timeToStation: Double = distanceTo(groundStation, metric = timeToTransmit).inject("timeToStation")
+        val timeToStation: Double = distanceTo(
+            groundStation,
+            metric = timeToTransmit,
+            isRiemannianManifold = false,
+        ).inject("timeToStation")
         val myLeader = boundedElection(
             strength = -timeToStation,
             bound = streamingBitRate.timeToTransmitOneMb,
             metric = timeToTransmit,
+            selectBest = { c1, c2 ->
+                maxOf(c1, c2, compareBy<Candidacy<Int, Double, Double>>{ it.strength }.thenBy { it.candidate })
+            }
         ).inject("myLeader")
         val imLeader = myLeader == localId
         imLeader.inject("imLeader")
-        val distanceToLeader = distanceTo(imLeader, metric = timeToTransmit).inject("distanceToLeader")
+        val distanceToLeader = distanceTo(
+            imLeader,
+            metric = timeToTransmit,
+            isRiemannianManifold = false,
+        ).inject("distanceToLeader")
         val potentialRelays = neighboring(myLeader).map { it != myLeader }.inject("potentialRelays")
-        val myRelay = potentialRelays.alignedMap(timeToStation + timeToTransmit) { canRelay, distance ->
+        val timesToStationAround = neighboring(timeToStation).inject("timesToStationAround")
+        val myRelay = potentialRelays.alignedMap(timesToStationAround + timeToTransmit) { canRelay, distance ->
             when {
                 canRelay -> distance
                 else -> POSITIVE_INFINITY
@@ -78,24 +108,6 @@ fun Aggregate<Int>.gradientEntrypoint(
     }
     return Unit
 }
-
-//fun main() {
-//    repeat(1000) { i ->
-//        val size = 1000 - i
-//        val origin = generateSequence(0) { it + 1 }.take(size)
-//        val list = origin.toList()
-//        val set = origin.toSet()
-//        val queries = generateSequence(0) { (it + 1) % (size * 2) }.take(10_000).shuffled()
-//        fun Collection<*>.queries() = queries.forEach { it in this }
-//        fun warmup() {
-//            list.queries()
-//            set.queries()
-//        }
-//        val listTime = measureTime { queries.forEach { it in list } }
-//        val setTime = measureTime { queries.forEach { it in set } }
-//        println("With $size elements, ${"List".takeIf { listTime < setTime } ?: "Set"} is preferable: List time: $listTime, Set time: $setTime")
-//    }
-//}
 
 @JvmInline
 value class Distance(val meters: Double)  : Comparable<Distance> {
