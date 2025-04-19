@@ -57,6 +57,16 @@ dependencies {
     }
 }
 
+val exportMetricInCSV by tasks.registering(JavaExec::class) {
+    dependsOn(tasks.withType<KotlinCompile>())
+    description = "Exports the data rate metric into a csv"
+    val fileName = "data/metric_data.csv"
+    outputs.dir(file("data"))
+    mainClass.set("it.unibo.clustered.seaborn.comm.Metric")
+    classpath = sourceSets["main"].runtimeClasspath
+    args(fileName)
+}
+
 val createGpxRoutes by tasks.registering(JavaExec::class) {
     dependsOn(tasks.withType<KotlinCompile>())
     group = alchemistGroupGraphic

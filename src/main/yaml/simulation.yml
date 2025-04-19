@@ -109,3 +109,27 @@ terminate:
   parameters:
     equalIntervals: 5
     checkInterval: 100
+
+export:
+  - type: CSVExporter
+    parameters:
+      fileNameRoot: clustered_comm
+      interval: 1.0
+      exportPath: data
+    data:
+      - time
+      - molecule: upstream-data-rate
+        aggregators: [ mean, variance, median ]
+        value-filter: "onlyFinite"
+      - molecule: distanceToLeader
+        aggregators: [ mean, variance, median ]
+        value-filter: "onlyFinite"
+
+      # intra-cluster data-rate
+      # inter-cluster data-rate
+      # cluster size
+      # clusters count
+      # clusters of one element
+      # Reduction factor
+      # Single-element data-rate
+      # Loss factor

@@ -7,6 +7,8 @@ src/main/resources/navigation-routes/**
 # Ignore raw data
 ais-data/
 
+data/cluster*
+
 #########################
 
 # Byte-compiled / optimized / DLL files

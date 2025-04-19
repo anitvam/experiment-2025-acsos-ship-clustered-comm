@@ -184,7 +184,7 @@ if __name__ == '__main__':
     # How to name the summary of the processed data
     pickleOutput = 'data_summary'
     # Experiment prefixes: one per experiment (root of the file name)
-    experiments = ['simulation']
+    experiments = ['clustered_comm']
     floatPrecision = '{: 0.3f}'
     # Number of time samples 
     timeSamples = 100
