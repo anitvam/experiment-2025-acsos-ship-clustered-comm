@@ -1,8 +1,60 @@
 package it.unibo.clustered.seaborn.comm
 
 import it.unibo.clustered.seaborn.comm.Metric.disconnected
+import it.unibo.clustered.seaborn.comm.Metric.kiloBitsPerSecond
 import java.io.File
 import kotlin.Double.Companion.POSITIVE_INFINITY
+import kotlin.math.exp
+import kotlin.math.ln
+
+// Fit exponential function y = a * exp(-b * x)
+fun fitExponential(dataRates: Map<Distance, DataRate>): (Distance) -> DataRate {
+    // Solve:
+    // y = a * exp(-b * x)
+    // ln(y) = ln(a) - b * x  -> linear regression
+    require(dataRates.values.all { it.kiloBitsPerSecond > 0 }) {
+        "All data rates must be strictly positive (found: ${dataRates.filterValues { it.kiloBitsPerSecond <= 0 }})"
+    }
+    val distances = dataRates.keys
+    val n = dataRates.size
+    val lnY = dataRates.mapValues { (_, dataRate) -> ln(dataRate.kiloBitsPerSecond) }
+    val sumX = distances.sumOf { it.meters }
+    check(sumX.isFinite()) { "Sum of distances must be finite" }
+    val sumLnY = lnY.values.sum()
+    check(sumLnY.isFinite()) { "Sum of lnY must be finite" }
+    val sumX2 = distances.sumOf { it.meters * it.meters }
+    val sumXlnY = lnY.toList().sumOf { it.first.meters * it.second }
+    val denominator = n * sumX2 - sumX * sumX
+    check(denominator > 0) { "Denominator must be positive" }
+    val b = (n * sumXlnY - sumX * sumLnY) / denominator
+    check(b.isFinite()) { "B must be finite" }
+    val lnA = (sumLnY - b * sumX) / n
+    check(lnA.isFinite()) { "lnA must be finite" }
+    val a = exp(lnA)
+    check(a > 0) { "a must be positive" }
+    return { d: Distance -> (a * exp(-b * d.meters)).kiloBitsPerSecond }
+}
+
+fun interpolateLogLinear(data: Map<Distance, DataRate>): (Distance) -> DataRate {
+    val sorted = data.entries.sortedBy { it.key.meters }
+    return { d: Distance ->
+        val x = d.meters
+        val (low, high) = sorted
+            .zipWithNext()
+            .firstOrNull { x in it.first.key.meters..it.second.key.meters }
+            ?: if (x < sorted.first().key.meters) sorted.first() to sorted.first()
+            else sorted.last() to sorted.last()
+
+        val x0 = low.key.meters
+        val x1 = high.key.meters
+        val y0 = ln(low.value.kiloBitsPerSecond)
+        val y1 = ln(high.value.kiloBitsPerSecond)
+
+        val proportion = if (x1 != x0) (x - x0) / (x1 - x0) else 0.0
+        val lnInterpolated = y0 + proportion * (y1 - y0)
+        exp(lnInterpolated).kiloBitsPerSecond
+    }
+}
 
 fun interface ConnectionTechnology {
     operator fun invoke (distance: Distance): DataRate

@@ -2,7 +2,7 @@ environment:
   type: NavigationEnvironment
   parameters:
     - ["maps/north_germany_coastline.geojson"]
- #   - ["maps/north_germany_waterways.geojson", "maps/north_germany_waterways3.geojson"]
+  #   - ["maps/north_germany_waterways.geojson", "maps/north_germany_waterways3.geojson"]
 
 variables:
   one-minute-hz: &one-minute-hz
@@ -27,9 +27,9 @@ _pool: &program
     program:
       name: "ShipComm"
       code: |
-        import it.unibo.clustered.seaborn.comm.*
+        import it.unibo.clustered.seaborn.comm.
       entrypoint: |
-        clusteredBellmanFord(device)
+        distanceBellmanFord(device)
 
 _pools:
   - pool: &move

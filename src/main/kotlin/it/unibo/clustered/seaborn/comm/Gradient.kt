@@ -4,36 +4,50 @@ import it.unibo.alchemist.collektive.device.CollektiveDevice
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
-import it.unibo.collektive.field.operations.any
 import it.unibo.collektive.field.operations.anyWithSelf
-import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.minWithId
 import it.unibo.collektive.stdlib.consensus.Candidacy
 import it.unibo.collektive.stdlib.consensus.boundedElection
-import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import kotlin.Double.Companion.POSITIVE_INFINITY
-import kotlin.math.exp
-import kotlin.math.ln
-import it.unibo.clustered.seaborn.comm.Metric
 import it.unibo.clustered.seaborn.comm.Metric.aprs
 import it.unibo.clustered.seaborn.comm.Metric.disconnected
 import it.unibo.clustered.seaborn.comm.Metric.gigaBitsPerSecond
-import it.unibo.clustered.seaborn.comm.Metric.kiloBitsPerSecond
 import it.unibo.clustered.seaborn.comm.Metric.loopBack
 import it.unibo.clustered.seaborn.comm.Metric.lora
 import it.unibo.clustered.seaborn.comm.Metric.megaBitsPerSecond
 import it.unibo.clustered.seaborn.comm.Metric.midband5G
 import it.unibo.clustered.seaborn.comm.Metric.wifi
+import it.unibo.collektive.field.operations.any
+import it.unibo.collektive.field.operations.max
+import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
+import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
+import it.unibo.collektive.stdlib.spreading.gradientCast
 
 private typealias RelayInfo<ID> = Pair<ID, Double>
 private fun <ID> RelayInfo<ID>.relayId(): ID = first
 private val RelayInfo<*>.distanceToLeader: Double get() = second
 
+
+fun Aggregate<Int>.distanceBellmanFord(
+    environment: CollektiveDevice<*>
+): Any? {
+    val groundStation: Boolean = environment.isDefined("station")
+    return bellmanFordGradientCast(
+        groundStation,
+        local = 0.0,
+        accumulateData = { source: Double, dest: Double, value: Double ->
+            // sommerei il tempo richiesto a far transitare il payload da source a dest
+            0.0
+        },
+        metric = with(environment) { distances() }.map { it.meters.meters }
+    )
+}
+
 /**
  * The entrypoint of the simulation running a gradient.
  */
-fun Aggregate<Int>.entrypoint(
+fun Aggregate<Int>.clusteredBellmanFord(
     environment: CollektiveDevice<*>
 ): Any? {
     fun <T> T.inject(name: String) = also { environment[name] = this }
@@ -91,6 +105,7 @@ fun Aggregate<Int>.entrypoint(
                 maxOf(c1, c2, compareBy<Candidacy<Int, Double, Double>>{ it.strength }.thenBy { it.candidate })
             }
         ).inject("myLeader")
+        //dataRates[myLeader].inject("data-rate-towards-leader") // Why myLeader has a key which does not exist in map?
         val imLeader = myLeader == localId
         imLeader.inject("imLeader")
         val distanceToLeader = distanceTo(
@@ -101,7 +116,7 @@ fun Aggregate<Int>.entrypoint(
         val timesToStationAround = neighboring(timeToStation).inject("timesToStationAround")
         val localTimeToStation = timesToStationAround.localValue
         val potentialRelays = neighboring(myLeader)
-            .alignedMap<Double, Boolean>(timesToStationAround) { leader, distance ->
+            .alignedMap(timesToStationAround) { leader, distance ->
                 leader != myLeader && distance < localTimeToStation
             }.inject("potentialRelays")
         val myRelay = potentialRelays.alignedMap(timesToStationAround + timeToTransmit) { canRelay, distance ->
@@ -113,62 +128,13 @@ fun Aggregate<Int>.entrypoint(
         val imRelay = neighboring(myRelay).map { it == localId }.any(false).inject("imRelay")
         val upstreamToRelay = dataRates[myRelay]
         val iHaveARelay = imLeader && myRelay != localId
-        environment["upstream-data-rate"] = when {
+        environment["leader-to-relay-data-rate"] = when {
             iHaveARelay -> upstreamToRelay.kiloBitsPerSecond
             else -> 0.0
         }
         return timeToTransmit[myRelay]
     }
     return Unit
-}
-
-// Fit exponential function y = a * exp(-b * x)
-fun fitExponential(dataRates: Map<Distance, DataRate>): (Distance) -> DataRate {
-    // Solve:
-    // y = a * exp(-b * x)
-    // ln(y) = ln(a) - b * x  -> linear regression
-    require(dataRates.values.all { it.kiloBitsPerSecond > 0 }) {
-        "All data rates must be strictly positive (found: ${dataRates.filterValues { it.kiloBitsPerSecond <= 0 }})"
-    }
-    val distances = dataRates.keys
-    val n = dataRates.size
-    val lnY = dataRates.mapValues { (_, dataRate) -> ln(dataRate.kiloBitsPerSecond) }
-    val sumX = distances.sumOf { it.meters }
-    check(sumX.isFinite()) { "Sum of distances must be finite" }
-    val sumLnY = lnY.values.sum()
-    check(sumLnY.isFinite()) { "Sum of lnY must be finite" }
-    val sumX2 = distances.sumOf { it.meters * it.meters }
-    val sumXlnY = lnY.toList().sumOf { it.first.meters * it.second }
-    val denominator = n * sumX2 - sumX * sumX
-    check(denominator > 0) { "Denominator must be positive" }
-    val b = (n * sumXlnY - sumX * sumLnY) / denominator
-    check(b.isFinite()) { "B must be finite" }
-    val lnA = (sumLnY - b * sumX) / n
-    check(lnA.isFinite()) { "lnA must be finite" }
-    val a = exp(lnA)
-    check(a > 0) { "a must be positive" }
-    return { d: Distance -> (a * exp(-b * d.meters)).kiloBitsPerSecond }
-}
-
-fun interpolateLogLinear(data: Map<Distance, DataRate>): (Distance) -> DataRate {
-    val sorted = data.entries.sortedBy { it.key.meters }
-    return { d: Distance ->
-        val x = d.meters
-        val (low, high) = sorted
-            .zipWithNext()
-            .firstOrNull { x in it.first.key.meters..it.second.key.meters }
-            ?: if (x < sorted.first().key.meters) sorted.first() to sorted.first()
-               else sorted.last() to sorted.last()
-
-        val x0 = low.key.meters
-        val x1 = high.key.meters
-        val y0 = ln(low.value.kiloBitsPerSecond)
-        val y1 = ln(high.value.kiloBitsPerSecond)
-
-        val proportion = if (x1 != x0) (x - x0) / (x1 - x0) else 0.0
-        val lnInterpolated = y0 + proportion * (y1 - y0)
-        exp(lnInterpolated).kiloBitsPerSecond
-    }
 }
 
 fun main() {
