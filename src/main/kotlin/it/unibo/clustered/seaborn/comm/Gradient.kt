@@ -23,12 +23,40 @@ import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
 import it.unibo.collektive.stdlib.spreading.gradientCast
+import kotlin.collections.set
 
 private typealias RelayInfo<ID> = Pair<ID, Double>
 private fun <ID> RelayInfo<ID>.relayId(): ID = first
 private val RelayInfo<*>.distanceToLeader: Double get() = second
 
+/**
+ * Baseline 2: Bellman Ford shortest path using the lowest data rate as metric
+ */
+fun Aggregate<Int>.dataRateBellmanFord(
+    environment: CollektiveDevice<*>
+): Any? {
+    val groundStation: Boolean = environment.isDefined("station")
+    return bellmanFordGradientCast(
+        groundStation,
+        local = 0.0,
+        accumulateData = { source: Double, dest: Double, value: Double ->
+            // sommerei il tempo richiesto a far transitare il payload da source a dest
+            0.0
+        },
+        metric = computeDataRates(
+            environment,
+            with(environment) { distances() }.map { it.meters }
+        ).map {
+            it.timeToTransmitOneKb
+        }
+    )
 
+}
+
+/**
+ * Baseline 1: Bellman Ford shortest path using the distance between each node as a metric.
+ * Maybe here we can ignore the 5g probability.
+ */
 fun Aggregate<Int>.distanceBellmanFord(
     environment: CollektiveDevice<*>
 ): Any? {
@@ -56,39 +84,10 @@ fun Aggregate<Int>.clusteredBellmanFord(
         .inject("distance")
     val is5gAntenna: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
     val thisIsA5gAntenna = is5gAntenna.localValue
-    val dataRate5g = distances.alignedMapWithId(is5gAntenna) { id, distance, neighborIs5g ->
-        when {
-            id == localId -> loopBack
-            neighborIs5g && thisIsA5gAntenna -> 10.gigaBitsPerSecond // 5g towers with fiber backhaul
-            neighborIs5g || thisIsA5gAntenna -> midband5G(distance)
-            else -> disconnected
-        }
-    }.inject("5g data rates").max(base = disconnected).inject("5g data rate")
     // Once data rates have been established, 5g towers are cut off the computation,
     // they just relay the communication
     if (!thisIsA5gAntenna) { //
-        val has5gAntenna = evolve(
-            when (val probability = environment.get<Any?>("5gProbability")) {
-                is Number -> environment.randomGenerator.nextDouble() < probability.toDouble()
-                else -> false
-            }
-        ) { it }.inject("has5gAntenna")
-        val antennasAround = neighboring(has5gAntenna).anyWithSelf { it }
-        val dataRates = distances.mapWithId { id, distance ->
-            when {
-                id == localId -> loopBack
-                else -> {
-                    val classicDataRates = maxOf(lora(distance), wifi(distance), aprs(distance), dataRate5g)
-                    when {
-                        antennasAround -> {
-                            val shipToShip5G = maxOf(dataRate5g, midband5G(distance))
-                            maxOf(shipToShip5G, classicDataRates)
-                        }
-                        else -> classicDataRates
-                    }
-                }
-            }
-        }.inject("dataRates")
+        val dataRates = computeDataRates(environment, distances)
         dataRates.max(base = disconnected).inject("max-data-rate")
         val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
         val streamingBitRate = 3.megaBitsPerSecond
@@ -135,6 +134,47 @@ fun Aggregate<Int>.clusteredBellmanFord(
         return timeToTransmit[myRelay]
     }
     return Unit
+}
+
+
+fun Aggregate<Int>.computeDataRates(
+    environment: CollektiveDevice<*>,
+    distances: Field<Int, Distance>,
+): Field<Int, DataRate> {
+    fun <T> T.inject(name: String) = also { environment[name] = this }
+    val is5gAntenna: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
+    val thisIsA5gAntenna = is5gAntenna.localValue
+    val dataRate5g = distances.alignedMapWithId(is5gAntenna) { id, distance, neighborIs5g ->
+        when {
+            id == localId -> loopBack
+            neighborIs5g && thisIsA5gAntenna -> 10.gigaBitsPerSecond // 5g towers with fiber backhaul
+            neighborIs5g || thisIsA5gAntenna -> midband5G(distance)
+            else -> disconnected
+        }
+    }.inject("5g data rates").max(base = disconnected).inject("5g data rate")
+
+    val has5gAntenna = evolve(
+        when (val probability = environment.get<Any?>("5gProbability")) {
+            is Number -> environment.randomGenerator.nextDouble() < probability.toDouble()
+            else -> false
+        }
+    ) { it }.inject("has5gAntenna")
+    val antennasAround = neighboring(has5gAntenna).anyWithSelf { it }
+    return distances.mapWithId { id, distance ->
+        when {
+            id == localId -> loopBack
+            else -> {
+                val classicDataRates = maxOf(lora(distance), wifi(distance), aprs(distance), dataRate5g)
+                when {
+                    antennasAround -> {
+                        val shipToShip5G = maxOf(dataRate5g, midband5G(distance))
+                        maxOf(shipToShip5G, classicDataRates)
+                    }
+                    else -> classicDataRates
+                }
+            }
+        }
+    }.inject("dataRates")
 }
 
 fun main() {
