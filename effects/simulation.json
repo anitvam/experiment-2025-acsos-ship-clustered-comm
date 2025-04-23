@@ -1,11 +1,14 @@
 [
   {
+    "type": "class it.unibo.alchemist.boundary.gui.effects.DrawNetwork"
+  },
+  {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShoreline",
-    "markerNodeID": 128
+    "markerNodeID": 384
   },
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawRoutes",
-    "markerNodeID": 128
+    "markerNodeID": 384
   },
   {
     "type": "class it.unibo.alchemist.boundary.gui.effects.DrawShape",
@@ -284,7 +287,7 @@
     "molFilter": true,
     "molString": "ShipComm",
     "molPropertyFilter": true,
-    "property": "if (localId == -1) 1.0 else 0.0",
+    "property": "if (localId \u003d\u003d -1) 1.0 else 0.0",
     "writingPropertyValue": false,
     "c": "ALPHA",
     "reverse": false,
