@@ -104,11 +104,10 @@ deployments:
     contents:
       - molecule: 5gAntenna
         concentration: true
+
 terminate:
-  type: StableForSteps
-  parameters:
-    equalIntervals: 5
-    checkInterval: 100
+  type: AfterTime
+  parameters: 86400
 
 export:
   - type: CSVExporter
@@ -118,19 +117,19 @@ export:
       exportPath: data
     data:
       - time
-      - molecule: data-rate-towards-leader # INTRA-BW. Need to group by cluster + exclude leaders.
+      - molecule: data-rate-towards-leader # INTRA-CLUSTER
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
-      - molecule: inter-cluster-data-rate # INTER-BW. Exclude all values not coming from leaders
+      - molecule: inter-cluster-data-rate # INTER-CLUSTER
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
       - molecule: distanceToLeader
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
 
-      # cluster size
-      # clusters count
-      # clusters of one element
-      # Reduction factor := sum(intra-cluster-data-rate)/sum(inter-cluster-data-rate
-      # Single-element data-rate (==data-rate-towards-leader)
+      # cluster size: Conto quante occorrenze del myL eader ho
+      # clusters count: Esporto il leader e faccio un estrattore che conta le singole occorrenze dei leader.
+      # clusters of one element. Conto quante occorrenze del myLeader ho e tengo quelle di dimensione 1.
+      # Reduction factor := sum(intra-cluster-data-rate)/sum(inter-cluster-data-rate)
+      # Single-element data-rate (==data-rate) => Metrica con cui ci compariamo con le baseline
       # Loss factor (amount of information received by the leader / amount of info. trasmitted)
