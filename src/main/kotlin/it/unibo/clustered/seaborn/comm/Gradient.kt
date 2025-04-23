@@ -76,7 +76,7 @@ fun Aggregate<Int>.distanceBellmanFord(
  * The entrypoint of the simulation running a gradient.
  */
 fun Aggregate<Int>.clusteredBellmanFord(
-    environment: CollektiveDevice<*>
+    environment: CollektiveDevice<*>,
 ): Any? {
     fun <T> T.inject(name: String) = also { environment[name] = this }
     val groundStation: Boolean = environment.isDefined("station")
@@ -90,7 +90,10 @@ fun Aggregate<Int>.clusteredBellmanFord(
         val dataRates = computeDataRates(environment, distances)
         dataRates.max(base = disconnected).inject("max-data-rate")
         val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
-        val streamingBitRate = 3.megaBitsPerSecond
+
+        val payloadSize = environment.get<Double>("payloadSize")
+        val streamingBitRate = payloadSize.megaBitsPerSecond
+
         val timeToStation: Double = distanceTo(
             groundStation,
             metric = timeToTransmit,
