@@ -11,6 +11,7 @@ import it.unibo.collektive.stdlib.consensus.boundedElection
 import it.unibo.collektive.stdlib.spreading.distanceTo
 import kotlin.Double.Companion.POSITIVE_INFINITY
 import it.unibo.clustered.seaborn.comm.Metric.aprs
+import it.unibo.clustered.seaborn.comm.Metric.bitsPerSecond
 import it.unibo.clustered.seaborn.comm.Metric.disconnected
 import it.unibo.clustered.seaborn.comm.Metric.gigaBitsPerSecond
 import it.unibo.clustered.seaborn.comm.Metric.loopBack
@@ -18,19 +19,21 @@ import it.unibo.clustered.seaborn.comm.Metric.lora
 import it.unibo.clustered.seaborn.comm.Metric.megaBitsPerSecond
 import it.unibo.clustered.seaborn.comm.Metric.midband5G
 import it.unibo.clustered.seaborn.comm.Metric.wifi
+import it.unibo.collektive.aggregate.api.exchange
+import it.unibo.collektive.aggregate.api.mapNeighborhood
+import it.unibo.collektive.field.Field.Companion.foldWithId
 import it.unibo.collektive.field.operations.any
 import it.unibo.collektive.field.operations.max
+import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
-import it.unibo.collektive.stdlib.spreading.gradientCast
-import kotlin.collections.set
 
 private typealias RelayInfo<ID> = Pair<ID, Double>
 private fun <ID> RelayInfo<ID>.relayId(): ID = first
 private val RelayInfo<*>.distanceToLeader: Double get() = second
 
 /**
- * Baseline 2: Bellman Ford shortest path using the lowest data rate as metric
+ * Baseline 3: Bellman Ford shortest path using the lowest data rate as metric
  */
 fun Aggregate<Int>.dataRateBellmanFord(
     environment: CollektiveDevice<*>
@@ -54,30 +57,50 @@ fun Aggregate<Int>.dataRateBellmanFord(
 }
 
 /**
- * Baseline 1: Bellman Ford shortest path using the distance between each node as a metric.
+ * Baseline 2: Bellman Ford shortest path using the distance between each node as a metric.
  * Maybe here we can ignore the 5g probability.
  */
-fun Aggregate<Int>.distanceBellmanFord(
-    environment: CollektiveDevice<*>
-): Any? {
-    val groundStation: Boolean = environment.isDefined("station")
-    return bellmanFordGradientCast(
-        groundStation,
-        local = 0.0,
-        accumulateData = { source: Double, dest: Double, value: Double ->
-            // sommerei il tempo richiesto a far transitare il payload da source a dest
-            0.0
-        },
-        metric = with(environment) { distances() }.map { it.meters.meters }
-    )
-}
+//fun Aggregate<Int>.baseline2Dist(
+//    environment: CollektiveDevice<*>,
+//    groundStation: Boolean,
+//    dataRates: Field<Int, DataRate>,
+//): DataRate {
+//    val groundStation: Boolean = environment.isDefined("station")
+//    val dataRateDirectToStation = neighboring(groundStation).alignedMap(dataRates) { station, dataRate ->
+//        when {
+//            station -> dataRate
+//            else -> disconnected
+//        }
+//    }.max(disconnected)
+//    val myDistance = bellmanFordGradientCast<Int, DataRate, Distance>(
+//        groundStation,
+//        local = if (groundStation) loopBack else disconnected,
+//        bottom = 0.meters,
+//        top = POSITIVE_INFINITY.meters,
+//        accumulateData = { source: Distance, dest: Distance, value: DataRate ->
+//            when {
+//                dataRateDirectToStation > disconnected -> dataRateDirectToStation
+//
+//            }
+//        },
+//        accumulateDistance = Distance::plus,
+//        metric = with(environment) { distances() }.map { it.meters }
+//    )
+//    return neighboring(myDistance).alignedMap( dataRates) { distance, dataRate ->
+//        distance to dataRate
+//    }.minBy(POSITIVE_INFINITY.meters to 0.bitsPerSecond ) { it.first }.second
+//}
 
 /**
  * The entrypoint of the simulation running a gradient.
  */
 fun Aggregate<Int>.clusteredBellmanFord(
-    environment: CollektiveDevice<*>,
+    environment: CollektiveDevice<*>
 ): Any? {
+    // Streaming data rate
+    val payloadSize = environment.get<Double>("payloadSize")
+    val streamingBitRate = payloadSize.megaBitsPerSecond
+
     fun <T> T.inject(name: String) = also { environment[name] = this }
     val groundStation: Boolean = environment.isDefined("station")
     val distances: Field<Int, Distance> = with(environment) { distances() }.map { it.meters }
@@ -91,14 +114,62 @@ fun Aggregate<Int>.clusteredBellmanFord(
         dataRates.max(base = disconnected).inject("max-data-rate")
         val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
 
-        val payloadSize = environment.get<Double>("payloadSize")
-        val streamingBitRate = payloadSize.megaBitsPerSecond
-
         val timeToStation: Double = distanceTo(
+
+        // Baseline 1: direct communication with the station only
+        val stationsNearby = neighboring(groundStation)
+        val baseline1 = stationsNearby
+            .alignedMap(dataRates) { isStation, dataRate -> dataRate.takeIf { isStation } ?: disconnected }
+        val baseline1MaxData = baseline1.max(base = disconnected).inject("baseline1-data-rate")
+
+        // Baseline 2: min distance data rate
+        val distanceToStation = distanceTo(groundStation, bottom = 0.meters, top = POSITIVE_INFINITY.meters, metric = distances, accumulateDistance = Distance::plus)
+        val neighborDistances = neighboring(distanceToStation)
+        val distanceThroughRelay = distances.alignedMap(neighborDistances, Distance::plus)
+        val baseline2parent = distanceThroughRelay.foldWithId(localId to POSITIVE_INFINITY.meters) { current, id, distance ->
+            when {
+                current.second > distance -> id to distance
+                else -> current
+            }
+        }.first
+        val children = neighboring(baseline2parent).foldWithId(mutableSetOf<Int>()) { accumulator, id, neighborParentId ->
+            accumulator.also { if (neighborParentId == localId) it += id }
+        }.inject("baseline2-children")
+        val childrenCount = children.size.inject("baseline2-children-count")
+        val baseline2parentDataRate: DataRate = when {
+            baseline2parent == localId -> 0.bitsPerSecond
+            else -> dataRates[baseline2parent]
+        }.inject("baseline2-parent-clean-data-rate")
+        exchange(baseline2parentDataRate) { xcDataRates ->
+            val actualUpload = dataRates.alignedMapWithId(xcDataRates) { id, idealDR, actualDR ->
+                when {
+                    stationsNearby[id] -> idealDR
+                    else -> actualDR
+                }
+            }[baseline2parent]
+            val sharedUpload = (actualUpload - streamingBitRate) / childrenCount.toDouble()
+            mapNeighborhood { id ->
+                when {
+                    id == localId -> actualUpload
+                    id in children -> sharedUpload
+                    else -> 0.bitsPerSecond
+                }
+            }
+        }.inject("baseline2-data-rate")
+
             groundStation,
             metric = timeToTransmit,
             isRiemannianManifold = false,
         ).inject("timeToStation")
+
+        // Baseline 3: min time to station
+        val distanceToStationDataRate3 = distanceTo(
+            groundStation,
+            metric = timeToTransmit,
+            isRiemannianManifold = false,
+        ).inject("distanceToStationDataRate3")
+
+        // Clustered
         val myLeader: Int = boundedElection(
             strength = -timeToStation,
             bound = streamingBitRate.timeToTransmitOneMb,
@@ -115,6 +186,13 @@ fun Aggregate<Int>.clusteredBellmanFord(
             metric = timeToTransmit,
             isRiemannianManifold = false,
         ).inject("distanceToLeader")
+        val idOfIntraClusterRelay = neighboring(distanceToLeader)
+            .alignedMap(timeToTransmit, Double::plus)
+            .mapWithId { id, time -> id to time }
+            .minBy(localId to POSITIVE_INFINITY) { it.second}
+            .first
+        val intraClusterDataRate = dataRates[idOfIntraClusterRelay].inject("intra-cluster-relay-data-rate")
+        (intraClusterDataRate.takeUnless { imLeader } ?: Double.NaN).inject("intra-cluster-relay-data-rate-not-leader")
         val timesToStationAround = neighboring(timeToStation).inject("timesToStationAround")
         val localTimeToStation = timesToStationAround.localValue
         val potentialRelays = neighboring(myLeader)
@@ -132,7 +210,7 @@ fun Aggregate<Int>.clusteredBellmanFord(
         val iHaveARelay = imLeader && myRelay != localId
         environment["leader-to-relay-data-rate"] = when {
             iHaveARelay -> upstreamToRelay.kiloBitsPerSecond
-            else -> 0.0
+            else -> Double.NaN
         }
         return timeToTransmit[myRelay]
     }

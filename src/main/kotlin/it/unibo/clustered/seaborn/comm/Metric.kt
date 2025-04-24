@@ -82,6 +82,8 @@ value class Distance(val meters: Double)  : Comparable<Distance> {
         else -> "${meters.readable}m"
     }
 
+    operator fun plus(other: Distance): Distance = Distance(meters + other.meters)
+
     override fun compareTo(other: Distance): Int = meters.compareTo(other.meters)
 }
 val Double.meters get() = Distance(this)
@@ -105,6 +107,14 @@ value class DataRate(val kiloBitsPerSecond: Double) : Comparable<DataRate> {
         megaBitsPerSecond > 1 -> "${megaBitsPerSecond.readable}Mbps"
         else -> "${kiloBitsPerSecond.readable}Kbps"
     }
+
+    operator fun plus(other: DataRate): DataRate = DataRate(kiloBitsPerSecond + other.kiloBitsPerSecond)
+
+    operator fun minus(other: DataRate): DataRate = DataRate(kiloBitsPerSecond - other.kiloBitsPerSecond)
+
+    operator fun times(other: Double): DataRate = DataRate(kiloBitsPerSecond * other)
+
+    operator fun div(other: Double): DataRate = DataRate(kiloBitsPerSecond / other)
 
     override fun compareTo(other: DataRate) = kiloBitsPerSecond.compareTo(other.kiloBitsPerSecond)
 }
