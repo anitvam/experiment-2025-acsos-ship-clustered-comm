@@ -39,7 +39,7 @@ _pool: &program
       code: |
         import it.unibo.clustered.seaborn.comm.*
       entrypoint: |
-        clusteredBellmanFord(device)
+        entrypoint(device)
 
 _pools:
   - pool: &move

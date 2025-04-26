@@ -21,6 +21,7 @@ import it.unibo.clustered.seaborn.comm.Metric.midband5G
 import it.unibo.clustered.seaborn.comm.Metric.wifi
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
+import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field.Companion.foldWithId
 import it.unibo.collektive.field.operations.any
 import it.unibo.collektive.field.operations.max
@@ -91,121 +92,122 @@ fun Aggregate<Int>.dataRateBellmanFord(
 //    }.minBy(POSITIVE_INFINITY.meters to 0.bitsPerSecond ) { it.first }.second
 //}
 
+fun <T> T.inject(
+    environment: CollektiveDevice<*>,
+    name: String
+) = also { environment[name] = this }
+
+
 /**
  * The entrypoint of the simulation running a gradient.
  */
-fun Aggregate<Int>.clusteredBellmanFord(
+fun Aggregate<Int>.entrypoint(
     environment: CollektiveDevice<*>
 ): Any? {
     // Streaming data rate
     val payloadSize = environment.get<Double>("payloadSize")
     val streamingBitRate = payloadSize.megaBitsPerSecond
 
-    fun <T> T.inject(name: String) = also { environment[name] = this }
     val groundStation: Boolean = environment.isDefined("station")
     val distances: Field<Int, Distance> = with(environment) { distances() }.map { it.meters }
-        .inject("distance")
+        .inject(environment, "distance")
     val is5gAntenna: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
     val thisIsA5gAntenna = is5gAntenna.localValue
     // Once data rates have been established, 5g towers are cut off the computation,
     // they just relay the communication
     if (!thisIsA5gAntenna) { //
-        val dataRates = computeDataRates(environment, distances)
-        dataRates.max(base = disconnected).inject("max-data-rate")
-        val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject("metric")
+        val dataRates: Field<Int, DataRate> = computeDataRates(environment, distances)
+        dataRates.max(base = disconnected).inject(environment, "max-data-rate")
+        val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject(environment, "metric")
 
-        val timeToStation: Double = distanceTo(
+
 
         // Baseline 1: direct communication with the station only
-        val stationsNearby = neighboring(groundStation)
+        val stationsNearby: Field<Int, Boolean> = neighboring(groundStation)
         val baseline1 = stationsNearby
             .alignedMap(dataRates) { isStation, dataRate -> dataRate.takeIf { isStation } ?: disconnected }
-        val baseline1MaxData = baseline1.max(base = disconnected).inject("baseline1-data-rate")
+        val baseline1MaxData = baseline1.max(base = disconnected).inject(environment, "baseline1-data-rate")
 
         // Baseline 2: min distance data rate
-        val distanceToStation = distanceTo(groundStation, bottom = 0.meters, top = POSITIVE_INFINITY.meters, metric = distances, accumulateDistance = Distance::plus)
-        val neighborDistances = neighboring(distanceToStation)
+        val baseline2DistanceToStation = distanceTo(
+            groundStation,
+            bottom = 0.meters,
+            top = POSITIVE_INFINITY.meters,
+            metric = distances,
+            accumulateDistance = Distance::plus
+        ).inject(environment, "baseline2-distanceToStation")
+        val neighborDistances = neighboring(baseline2DistanceToStation)
         val distanceThroughRelay = distances.alignedMap(neighborDistances, Distance::plus)
-        val baseline2parent = distanceThroughRelay.foldWithId(localId to POSITIVE_INFINITY.meters) { current, id, distance ->
+        val baseline2Parent = distanceThroughRelay.foldWithId(localId to POSITIVE_INFINITY.meters) { current, id, distance ->
             when {
                 current.second > distance -> id to distance
                 else -> current
             }
         }.first
-        val children = neighboring(baseline2parent).foldWithId(mutableSetOf<Int>()) { accumulator, id, neighborParentId ->
-            accumulator.also { if (neighborParentId == localId) it += id }
-        }.inject("baseline2-children")
-        val childrenCount = children.size.inject("baseline2-children-count")
-        val baseline2parentDataRate: DataRate = when {
-            baseline2parent == localId -> 0.bitsPerSecond
-            else -> dataRates[baseline2parent]
-        }.inject("baseline2-parent-clean-data-rate")
-        exchange(baseline2parentDataRate) { xcDataRates ->
-            val actualUpload = dataRates.alignedMapWithId(xcDataRates) { id, idealDR, actualDR ->
-                when {
-                    stationsNearby[id] -> idealDR
-                    else -> actualDR
-                }
-            }[baseline2parent]
-            val sharedUpload = (actualUpload - streamingBitRate) / childrenCount.toDouble()
-            mapNeighborhood { id ->
-                when {
-                    id == localId -> actualUpload
-                    id in children -> sharedUpload
-                    else -> 0.bitsPerSecond
-                }
-            }
-        }.inject("baseline2-data-rate")
-
-            groundStation,
-            metric = timeToTransmit,
-            isRiemannianManifold = false,
-        ).inject("timeToStation")
+        computeNonCooperativeDataRate("baseline2", streamingBitRate, environment, baseline2Parent, stationsNearby, dataRates)
 
         // Baseline 3: min time to station
-        val distanceToStationDataRate3 = distanceTo(
+        val baseline3TimeToStation = distanceTo(
             groundStation,
             metric = timeToTransmit,
             isRiemannianManifold = false,
-        ).inject("distanceToStationDataRate3")
+        ).inject(environment, "baseline3-timeToStation")
+
+        val baseline3neighborDistances = neighboring(baseline3TimeToStation)
+        val baseline3TimeToStationThroughRelays = timeToTransmit.alignedMap(baseline3neighborDistances, Double::plus)
+        val baseline3Parent = baseline3TimeToStationThroughRelays.foldWithId(localId to POSITIVE_INFINITY) { current, id, distance ->
+            when {
+                current.second > distance -> id to distance
+                else -> current
+            }
+        }.first
+        computeNonCooperativeDataRate("baseline3", streamingBitRate, environment, baseline3Parent, stationsNearby, dataRates)
+
+        // Clustered
+        val clusteredTimeToStation: Double = distanceTo(
+            groundStation,
+            metric = timeToTransmit,
+            isRiemannianManifold = false,
+        ).inject(environment, "clustered-timeToStation")
 
         // Clustered
         val myLeader: Int = boundedElection(
-            strength = -timeToStation,
+            strength = -clusteredTimeToStation,
             bound = streamingBitRate.timeToTransmitOneMb,
             metric = timeToTransmit,
             selectBest = { c1, c2 ->
                 maxOf(c1, c2, compareBy<Candidacy<Int, Double, Double>>{ it.strength }.thenBy { it.candidate })
             }
-        ).inject("myLeader")
-        //dataRates[myLeader].inject("data-rate-towards-leader") // Why myLeader has a key which does not exist in map?
+        ).inject(environment, "myLeader")
         val imLeader = myLeader == localId
-        imLeader.inject("imLeader")
+        imLeader.inject(environment, "imLeader")
         val distanceToLeader = distanceTo(
             imLeader,
             metric = timeToTransmit,
             isRiemannianManifold = false,
-        ).inject("distanceToLeader")
+        ).inject(environment, "distanceToLeader")
         val idOfIntraClusterRelay = neighboring(distanceToLeader)
             .alignedMap(timeToTransmit, Double::plus)
             .mapWithId { id, time -> id to time }
             .minBy(localId to POSITIVE_INFINITY) { it.second}
             .first
-        val intraClusterDataRate = dataRates[idOfIntraClusterRelay].inject("intra-cluster-relay-data-rate")
-        (intraClusterDataRate.takeUnless { imLeader } ?: Double.NaN).inject("intra-cluster-relay-data-rate-not-leader")
-        val timesToStationAround = neighboring(timeToStation).inject("timesToStationAround")
+        val intraClusterDataRate = dataRates[idOfIntraClusterRelay].inject(environment, "intra-cluster-relay-data-rate")
+        (intraClusterDataRate.takeUnless { imLeader } ?: Double.NaN).inject(environment, "intra-cluster-relay-data-rate-not-leader")
+
+
+        val timesToStationAround = neighboring(clusteredTimeToStation).inject(environment, "timesToStationAround")
         val localTimeToStation = timesToStationAround.localValue
         val potentialRelays = neighboring(myLeader)
             .alignedMap(timesToStationAround) { leader, distance ->
                 leader != myLeader && distance < localTimeToStation
-            }.inject("potentialRelays")
+            }.inject(environment, "potentialRelays")
         val myRelay = potentialRelays.alignedMap(timesToStationAround + timeToTransmit) { canRelay, distance ->
             when {
                 canRelay -> distance
                 else -> POSITIVE_INFINITY
             }
-        }.minWithId(localId to POSITIVE_INFINITY, compareBy { it.distanceToLeader }).relayId().inject("myRelay")
-        val imRelay = neighboring(myRelay).map { it == localId }.any(false).inject("imRelay")
+        }.minWithId(localId to POSITIVE_INFINITY, compareBy { it.distanceToLeader }).relayId().inject(environment, "myRelay")
+        val imRelay = neighboring(myRelay).map { it == localId }.any(false).inject(environment, "imRelay")
         val upstreamToRelay = dataRates[myRelay]
         val iHaveARelay = imLeader && myRelay != localId
         environment["leader-to-relay-data-rate"] = when {
@@ -215,6 +217,40 @@ fun Aggregate<Int>.clusteredBellmanFord(
         return timeToTransmit[myRelay]
     }
     return Unit
+}
+
+fun Aggregate<Int>.computeNonCooperativeDataRate(
+    experimentName: String,
+    streamingBitRate: DataRate,
+    environment: CollektiveDevice<*>,
+    parent: Int,
+    stationsNearby: Field<Int, Boolean>,
+    dataRates: Field<Int, DataRate>,
+) {
+    val children = neighboring(parent).foldWithId(mutableSetOf<Int>()) { accumulator, id, neighborParentId ->
+        accumulator.also { if (neighborParentId == localId) it += id }
+    }.inject(environment, "$experimentName-children")
+    val childrenCount = children.size.inject(environment, "$experimentName-children-count")
+    val parentDataRate: DataRate = when {
+        parent == localId -> 0.bitsPerSecond
+        else -> dataRates[parent]
+    }.inject(environment, "$experimentName-parent-clean-data-rate")
+    exchange(parentDataRate) { xcDataRates ->
+        val actualUpload = dataRates.alignedMapWithId(xcDataRates) { id, idealDR, actualDR ->
+            when {
+                stationsNearby[id] -> idealDR
+                else -> actualDR
+            }
+        }[parent]
+        val sharedUpload = (actualUpload - streamingBitRate) / childrenCount.toDouble()
+        mapNeighborhood { id ->
+            when {
+                id == localId -> actualUpload
+                id in children -> sharedUpload
+                else -> 0.bitsPerSecond
+            }
+        }
+    }.inject(environment, "$experimentName-data-rate")
 }
 
 
@@ -262,3 +298,4 @@ fun main() {
     (0..50).map { it.kilometers to "APRS: ${aprs(it.kilometers)}, LoRa: ${lora(it.kilometers)}" }
         .forEach(::println)
 }
+
