@@ -1,3 +1,5 @@
+incarnation: collektive
+
 environment:
   type: NavigationEnvironment
   parameters:
@@ -26,11 +28,10 @@ variables:
     max: 3
     step: 1
     default: 0
-incarnation: collektive
 
 network-model:
   type: ConnectWithinDistance
-  parameters: [15000]
+  parameters: [10000]
 
 _pool: &program
   - time-distribution: 0.5
@@ -139,7 +140,7 @@ export:
   - type: CSVExporter
     parameters:
       fileNameRoot: clustered_comm
-      interval: 1.0
+      interval: 60
       exportPath: data
     data:
       - time
