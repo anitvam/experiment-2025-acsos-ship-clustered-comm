@@ -6,6 +6,7 @@ import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Time
 import it.unibo.alchemist.model.molecules.SimpleMolecule
+import it.unibo.clustered.seaborn.comm.Metric.megaBitsPerSecond
 import it.unibo.util.toDouble
 import it.unibo.util.toInt
 import kotlin.String
@@ -32,7 +33,7 @@ class ReductionFactor @JvmOverloads constructor(
         reaction: Actionable<T>?,
         time: Time,
         step: Long
-    ): Map<Node<T>, Double> =
+    ): Map<Node<T>, Double> {
         /*
          * Marti: raggruppa i nodi per leaader, così trovi i cluster
          * scarta i cluster per cui il leader è sorgente (valgono 1, trasmettono tutto)
@@ -43,18 +44,46 @@ class ReductionFactor @JvmOverloads constructor(
          * fallo per tutti i cluster
          * per ogni nodo, esponi il valore del cluster
          */
-        environment.nodes.associateWith {
-            when (val leaderId = it.getConcentration(leader).toInt()) {
-                it.id -> 0.0
-                else -> {
-                    val interCluster = environment.getNodeByID(leaderId).getConcentration(interClusterDR).toDouble()
-                    it.getConcentration(intraClusterDR).toDouble() / interCluster
-                }
-            }
+        // raggruppa i nodi per leaader, così trovi i cluster
+        val clusters = environment.nodes.groupBy {
+            it.contents[leader]
+        }.mapKeys {
+            environment.getNodeByID(it.key.toInt())
         }
-//            it.contents[intraClusterDR].toDouble() / it.contents[interClusterDR].toDouble() }
+        // scarta i cluster per cui il leader è sorgente (valgono 1, trasmettono tutto)
+        val clustersWithoutSources = clusters.filterNot { it.key.contains(station) }
+        // Somma tutti gli intraClusterDR del cluster (intra totale), mettendo il massimo a 3mbit per ciascuno (se ho 100mb comunque ne mando 3)
+        val clustersDR = clustersWithoutSources.mapValues {
+            it.value.map { node -> node.contents[intraClusterDR] }.map { dr ->
+                when (dr) {
+                    is Double -> dr.coerceAtMost(3.0)
+                    else -> Double.NaN
+                }
+            }.fold(0.0, Double::plus)
+        }
+        println(environment.getNodeByID(421).first())
+        println(environment.nodes.groupBy {
+            it.contents[leader]
+        }.mapValues { it.value.map {node -> node.id } })
+        println(clusters.keys.first())
+        // fai la divisione fra la somma di prima (sum(min(3mbit, intradatarate)) diviso intracluster
+        return clustersDR.mapValues {
+            it.value / it.key.contents[interClusterDR].toDouble()
+        }
 
+//        environment.nodes.associateWith {
+//            when (val leaderId = it.getConcentration(leader).toInt()) {
+//                it.id -> 0.0
+//                else -> {
+//                    val interCluster = environment.getNodeByID(leaderId).getConcentration(interClusterDR).toDouble()
+//                    it.getConcentration(intraClusterDR).toDouble() / interCluster
+//                }
+//            }
+//        }
+//            it.contents[intraClusterDR].toDouble() / it.contents[interClusterDR].toDouble() }
+    }
     companion object {
+        val station = SimpleMolecule("station")
         val leader = SimpleMolecule("myLeader")
         val intraClusterDR = SimpleMolecule("export-intra-cluster-relay-data-rate-not-leader")
         val interClusterDR = SimpleMolecule("leader-to-relay-data-rate")
