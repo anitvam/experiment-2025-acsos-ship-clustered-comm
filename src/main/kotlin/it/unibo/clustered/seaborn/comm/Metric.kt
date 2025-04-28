@@ -35,21 +35,48 @@ fun fitExponential(dataRates: Map<Distance, DataRate>): (Distance) -> DataRate {
     return { d: Distance -> (a * exp(-b * d.meters)).kiloBitsPerSecond }
 }
 
+//fun interpolateLogLinear(data: Map<Distance, DataRate>): (Distance) -> DataRate {
+//    val sorted = data.entries.sortedBy { it.key.meters }
+//    return { d: Distance ->
+//        val x = d.meters
+//        val (low, high) = sorted
+//            .zipWithNext()
+//            .firstOrNull { x in it.first.key.meters..it.second.key.meters }
+//            ?: if (x < sorted.first().key.meters) sorted.first() to sorted.first()
+//            else sorted.last() to sorted.last()
+//
+//        val x0 = low.key.meters
+//        val x1 = high.key.meters
+//        val y0 = ln(low.value.kiloBitsPerSecond)
+//        val y1 = ln(high.value.kiloBitsPerSecond)
+//
+//        val proportion = if (x1 != x0) (x - x0) / (x1 - x0) else 0.0
+//        val lnInterpolated = y0 + proportion * (y1 - y0)
+//        exp(lnInterpolated).kiloBitsPerSecond
+//    }
+//}
+
 fun interpolateLogLinear(data: Map<Distance, DataRate>): (Distance) -> DataRate {
     val sorted = data.entries.sortedBy { it.key.meters }
+    val xs = sorted.map { it.key.meters }.toDoubleArray()
+    val ysLog = sorted.map { ln(it.value.kiloBitsPerSecond) }.toDoubleArray()
     return { d: Distance ->
         val x = d.meters
-        val (low, high) = sorted
-            .zipWithNext()
-            .firstOrNull { x in it.first.key.meters..it.second.key.meters }
-            ?: if (x < sorted.first().key.meters) sorted.first() to sorted.first()
-            else sorted.last() to sorted.last()
-
-        val x0 = low.key.meters
-        val x1 = high.key.meters
-        val y0 = ln(low.value.kiloBitsPerSecond)
-        val y1 = ln(high.value.kiloBitsPerSecond)
-
+        val idx = xs.binarySearch(x).let { if (it >= 0) it else -(it + 1) }
+        val i0 = when {
+            idx == 0 -> 0
+            idx >= xs.size -> xs.lastIndex
+            else -> idx - 1
+        }
+        val i1 = when {
+            idx == 0 -> 0
+            idx >= xs.size -> xs.lastIndex
+            else -> idx
+        }
+        val x0 = xs[i0]
+        val x1 = xs[i1]
+        val y0 = ysLog[i0]
+        val y1 = ysLog[i1]
         val proportion = if (x1 != x0) (x - x0) / (x1 - x0) else 0.0
         val lnInterpolated = y0 + proportion * (y1 - y0)
         exp(lnInterpolated).kiloBitsPerSecond
@@ -110,7 +137,8 @@ value class DataRate(val kiloBitsPerSecond: Double) : Comparable<DataRate> {
 
     operator fun plus(other: DataRate): DataRate = DataRate(kiloBitsPerSecond + other.kiloBitsPerSecond)
 
-    operator fun minus(other: DataRate): DataRate = DataRate(kiloBitsPerSecond - other.kiloBitsPerSecond)
+    operator fun minus(other: DataRate): DataRate = DataRate((kiloBitsPerSecond - other.kiloBitsPerSecond)
+        .coerceAtLeast(0.0))
 
     operator fun times(other: Double): DataRate = DataRate(kiloBitsPerSecond * other)
 

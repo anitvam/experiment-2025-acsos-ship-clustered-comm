@@ -29,6 +29,7 @@ import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
 import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
+import it.unibo.util.toDouble
 
 private typealias RelayInfo<ID> = Pair<ID, Double>
 private fun <ID> RelayInfo<ID>.relayId(): ID = first
@@ -37,7 +38,10 @@ private val RelayInfo<*>.distanceToLeader: Double get() = second
 fun <T> T.inject(
     environment: CollektiveDevice<*>,
     name: String
-) = also { environment[name] = this }
+) = also {
+    environment[name] = this
+    environment["export-$name"] = this.toDouble()
+}
 
 fun Aggregate<Int>.entrypoint(
     environment: CollektiveDevice<*>
