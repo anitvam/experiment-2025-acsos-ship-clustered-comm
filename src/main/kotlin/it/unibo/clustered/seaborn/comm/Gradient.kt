@@ -1,6 +1,7 @@
 package it.unibo.clustered.seaborn.comm
 
 import it.unibo.alchemist.collektive.device.CollektiveDevice
+import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
@@ -216,6 +217,13 @@ fun Aggregate<Int>.entrypoint(
         }
         return timeToTransmit[myRelay]
     }
+
+    // Exported info
+    val myLeaderMolecule = SimpleMolecule("myLeader")
+    environment.environment.nodes.map { it.contents[myLeaderMolecule] }
+        .count { it?.equals(environment.node.contents[myLeaderMolecule]) == true }
+        .inject(environment, "cluster-size")
+
     return Unit
 }
 
@@ -250,7 +258,7 @@ fun Aggregate<Int>.computeNonCooperativeDataRate(
                 else -> 0.bitsPerSecond
             }
         }
-    }.inject(environment, "$experimentName-data-rate")
+    }.localValue.inject(environment, "$experimentName-data-rate")
 }
 
 
