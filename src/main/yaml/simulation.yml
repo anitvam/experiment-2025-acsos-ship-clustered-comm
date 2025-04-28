@@ -144,7 +144,7 @@ export:
     data:
       - time
 
-      - molecule: intra-cluster-relay-data-rate-not-leader # INTRA-CLUSTER
+      - molecule: export-intra-cluster-relay-data-rate-not-leader # INTRA-CLUSTER
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
       - molecule: leader-to-relay-data-rate # INTER-CLUSTER
@@ -158,16 +158,16 @@ export:
       - type: ReductionFactor
     # - type: LossFactor # Loss factor (amount of information received by the leader / amount of info. trasmitted)
 
-      - molecule: intra-cluster-relay-data-rate # Single-element data-rate (==data-rate) => To compare w.r.t baselines
+      - molecule: export-intra-cluster-relay-data-rate # Single-element data-rate (==data-rate) => To compare w.r.t baselines
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
-      - molecule: baseline1-data-rate
+      - molecule: export-baseline1-data-rate
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
-      - molecule: baseline2-data-rate
+      - molecule: export-baseline2-data-rate
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
-      - molecule: baseline3-data-rate
+      - molecule: export-baseline3-data-rate
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
 

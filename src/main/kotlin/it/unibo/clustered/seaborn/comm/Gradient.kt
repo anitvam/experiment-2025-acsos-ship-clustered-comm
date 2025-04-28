@@ -156,14 +156,12 @@ fun Aggregate<Int>.entrypoint(
             iHaveARelay -> upstreamToRelay.kiloBitsPerSecond
             else -> Double.NaN
         }
+        // Exported info
+        val myLeaderMolecule = SimpleMolecule("myLeader")
+        environment.environment.nodes.count { it.contents[myLeaderMolecule] == myLeader }.inject(environment, "cluster-size")
+
         return timeToTransmit[myRelay]
     }
-
-    // Exported info
-    val myLeaderMolecule = SimpleMolecule("myLeader")
-    environment.environment.nodes.map { it.contents[myLeaderMolecule] }
-        .count { it?.equals(environment.node.contents[myLeaderMolecule]) == true }
-        .inject(environment, "cluster-size")
 
     return Unit
 }

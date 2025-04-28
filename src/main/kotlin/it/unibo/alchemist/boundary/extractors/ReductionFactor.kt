@@ -34,7 +34,7 @@ class ReductionFactor @JvmOverloads constructor(
         environment.nodes.associateWith { it.contents[intraClusterDR].toDouble() / it.contents[interClusterDR].toDouble() }
 
     companion object {
-        val intraClusterDR = SimpleMolecule("intra-cluster-relay-data-rate-not-leader")
+        val intraClusterDR = SimpleMolecule("export-intra-cluster-relay-data-rate-not-leader")
         val interClusterDR = SimpleMolecule("leader-to-relay-data-rate")
     }
 }
