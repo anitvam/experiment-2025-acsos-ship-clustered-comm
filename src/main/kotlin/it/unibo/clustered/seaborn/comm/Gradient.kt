@@ -34,74 +34,11 @@ private typealias RelayInfo<ID> = Pair<ID, Double>
 private fun <ID> RelayInfo<ID>.relayId(): ID = first
 private val RelayInfo<*>.distanceToLeader: Double get() = second
 
-/**
- * Baseline 3: Bellman Ford shortest path using the lowest data rate as metric
- */
-fun Aggregate<Int>.dataRateBellmanFord(
-    environment: CollektiveDevice<*>
-): Any? {
-    val groundStation: Boolean = environment.isDefined("station")
-    return bellmanFordGradientCast(
-        groundStation,
-        local = 0.0,
-        accumulateData = { source: Double, dest: Double, value: Double ->
-            // sommerei il tempo richiesto a far transitare il payload da source a dest
-            0.0
-        },
-        metric = computeDataRates(
-            environment,
-            with(environment) { distances() }.map { it.meters }
-        ).map {
-            it.timeToTransmitOneKb
-        }
-    )
-
-}
-
-/**
- * Baseline 2: Bellman Ford shortest path using the distance between each node as a metric.
- * Maybe here we can ignore the 5g probability.
- */
-//fun Aggregate<Int>.baseline2Dist(
-//    environment: CollektiveDevice<*>,
-//    groundStation: Boolean,
-//    dataRates: Field<Int, DataRate>,
-//): DataRate {
-//    val groundStation: Boolean = environment.isDefined("station")
-//    val dataRateDirectToStation = neighboring(groundStation).alignedMap(dataRates) { station, dataRate ->
-//        when {
-//            station -> dataRate
-//            else -> disconnected
-//        }
-//    }.max(disconnected)
-//    val myDistance = bellmanFordGradientCast<Int, DataRate, Distance>(
-//        groundStation,
-//        local = if (groundStation) loopBack else disconnected,
-//        bottom = 0.meters,
-//        top = POSITIVE_INFINITY.meters,
-//        accumulateData = { source: Distance, dest: Distance, value: DataRate ->
-//            when {
-//                dataRateDirectToStation > disconnected -> dataRateDirectToStation
-//
-//            }
-//        },
-//        accumulateDistance = Distance::plus,
-//        metric = with(environment) { distances() }.map { it.meters }
-//    )
-//    return neighboring(myDistance).alignedMap( dataRates) { distance, dataRate ->
-//        distance to dataRate
-//    }.minBy(POSITIVE_INFINITY.meters to 0.bitsPerSecond ) { it.first }.second
-//}
-
 fun <T> T.inject(
     environment: CollektiveDevice<*>,
     name: String
 ) = also { environment[name] = this }
 
-
-/**
- * The entrypoint of the simulation running a gradient.
- */
 fun Aggregate<Int>.entrypoint(
     environment: CollektiveDevice<*>
 ): Any? {
@@ -261,7 +198,6 @@ fun Aggregate<Int>.computeNonCooperativeDataRate(
     }.localValue.inject(environment, "$experimentName-data-rate")
 }
 
-
 fun Aggregate<Int>.computeDataRates(
     environment: CollektiveDevice<*>,
     distances: Field<Int, Distance>,
@@ -306,4 +242,3 @@ fun main() {
     (0..50).map { it.kilometers to "APRS: ${aprs(it.kilometers)}, LoRa: ${lora(it.kilometers)}" }
         .forEach(::println)
 }
-
