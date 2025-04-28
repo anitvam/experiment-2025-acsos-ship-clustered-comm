@@ -23,10 +23,6 @@ class FromGPSTraceCustom(
     private val traces: TraceLoader,
 ) : Deployment<GeoPosition> {
 
-    init {
-        println(traces.map { it.size() }.max())
-    }
-
     constructor(path: String, normalizer: String, vararg normalizerArgs: Any): this(
         TraceLoader(path, false, normalizer, *normalizerArgs)
     )
