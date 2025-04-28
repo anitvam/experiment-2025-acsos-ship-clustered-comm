@@ -46,10 +46,8 @@ class TestAisParser {
     fun testGpxGenerationFromAisData() {
         val aisMessage = AisDecoder.parseFile(dataToParse)
         assertTrue(aisMessage.isNotEmpty())
-        val xmlPath = File(
-            (object {}.javaClass.classLoader.getResource("ais-sample/gpx-generated")?.toURI())
-                ?: throw IllegalArgumentException("Missing sample directory in project resources")
-        )
+        val xmlPath = File("src/main/resources/ais-sample/gpx-traces")
+        xmlPath.mkdirs()
         val aisPayloads = AisPayload.from(aisMessage)
         val groupedByBoat = aisPayloads.groupBy { it.boatId }
         println(groupedByBoat.count())
