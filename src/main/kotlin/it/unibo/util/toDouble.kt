@@ -11,3 +11,20 @@ fun Any?.toDouble(): Double = when (this) {
     is Distance -> meters
     else -> Double.NaN
 }
+
+fun Any?.toInt(): Int = when (this) {
+    is Number -> this.toInt()
+    is String -> this.toInt()
+    is DataRate -> kiloBitsPerSecond.toInt()
+    is Distance -> meters.toInt()
+    else -> 0
+}
+
+fun Any?.toBoolean(): Boolean = when (this) {
+    is Number -> this.toInt() != 0
+    is String -> this.toBooleanStrict()
+    is DataRate -> toInt().toBoolean()
+    is Distance -> toInt().toBoolean()
+    else -> false
+}
+

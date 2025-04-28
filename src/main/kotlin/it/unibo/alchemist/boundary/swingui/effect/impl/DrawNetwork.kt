@@ -6,6 +6,8 @@ import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Position2D
 import it.unibo.alchemist.model.molecules.SimpleMolecule
+import it.unibo.util.toBoolean
+import it.unibo.util.toInt
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics2D
@@ -49,32 +51,4 @@ class DrawNetwork: Effect {
             }
         }
     }
-
-    companion object {
-        private fun Any?.toInt(): Int = when (this) {
-            is Int -> this
-            is Number -> this.toInt()
-            is String -> this.toInt()
-            null -> error("Unexpected value: $this")
-            Unit -> error("Unexpected value: $this")
-            else -> error("Unexpected value: $this")
-        }
-
-        private fun Any?.toDouble(): Double = when (this) {
-            is Double -> this
-            is Number -> this.toDouble()
-            null -> error("Unexpected value: $this")
-            Unit -> error("Unexpected value: $this")
-            else -> error("Unexpected value: $this")
-        }
-
-        private fun Any?.toBoolean(): Boolean = when (this) {
-            is Boolean -> this
-            is Number -> this != 0.0 // C lang semantics.
-            null -> false
-            Unit -> false
-            else -> error("Unexpected value: $this")
-        }
-    }
-
 }
