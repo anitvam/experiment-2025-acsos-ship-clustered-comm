@@ -150,7 +150,14 @@ export:
       exportPath: data
     data:
       - time
-
+      - type: DataRates
+        parameters: b1-dr
+      - type: DataRates
+        parameters: b2-dr
+      - type: DataRates
+        parameters: b3-dr
+      - type: DataRates
+        parameters: bc-dr
       - type: ReductionFactor
       - molecule: export-intra-cluster-relay-data-rate-not-leader # INTRA-CLUSTER
         aggregators: [ mean, variance, median ]

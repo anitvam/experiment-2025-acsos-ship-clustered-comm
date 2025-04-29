@@ -1,7 +1,6 @@
 package it.unibo.clustered.seaborn.comm
 
 import it.unibo.alchemist.collektive.device.CollektiveDevice
-import it.unibo.alchemist.model.molecules.SimpleMolecule
 import it.unibo.collektive.aggregate.api.Aggregate
 import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field
@@ -22,13 +21,11 @@ import it.unibo.clustered.seaborn.comm.Metric.midband5G
 import it.unibo.clustered.seaborn.comm.Metric.wifi
 import it.unibo.collektive.aggregate.api.exchange
 import it.unibo.collektive.aggregate.api.mapNeighborhood
-import it.unibo.collektive.aggregate.api.neighboring
 import it.unibo.collektive.field.Field.Companion.foldWithId
 import it.unibo.collektive.field.operations.any
 import it.unibo.collektive.field.operations.max
 import it.unibo.collektive.field.operations.minBy
 import it.unibo.collektive.stdlib.doubles.FieldedDoubles.plus
-import it.unibo.collektive.stdlib.spreading.bellmanFordGradientCast
 import it.unibo.util.toDouble
 
 private typealias RelayInfo<ID> = Pair<ID, Double>
@@ -68,7 +65,8 @@ fun Aggregate<Int>.entrypoint(
         val stationsNearby: Field<Int, Boolean> = neighboring(groundStation)
         val baseline1 = stationsNearby
             .alignedMap(dataRates) { isStation, dataRate -> dataRate.takeIf { isStation } ?: disconnected }
-        val baseline1MaxData = baseline1.max(base = disconnected).inject(environment, "baseline1-data-rate")
+        val baseline1MaxData = baseline1.max(base = disconnected).takeIf { it >= 3.megaBitsPerSecond } ?: disconnected
+        baseline1MaxData.max3Mbit().inject(environment, "baseline1-data-rate")
 
         // Baseline 2: min distance data rate
         val baseline2DistanceToStation = distanceTo(
@@ -85,7 +83,8 @@ fun Aggregate<Int>.entrypoint(
                 current.second > distance -> id to distance
                 else -> current
             }
-        }.first
+        }.first.inject(environment, "baseline2-parent")
+        dataRates[baseline2Parent].inject(environment, "baseline2-parent-data-rate")
         computeNonCooperativeDataRate("baseline2", streamingBitRate, environment, baseline2Parent, stationsNearby, dataRates)
 
         // Baseline 3: min time to station
@@ -95,14 +94,15 @@ fun Aggregate<Int>.entrypoint(
             isRiemannianManifold = false,
         ).inject(environment, "baseline3-timeToStation")
 
-        val baseline3neighborDistances = neighboring(baseline3TimeToStation)
-        val baseline3TimeToStationThroughRelays = timeToTransmit.alignedMap(baseline3neighborDistances, Double::plus)
-        val baseline3Parent = baseline3TimeToStationThroughRelays.foldWithId(localId to POSITIVE_INFINITY) { current, id, distance ->
+        val baseline3neighborTimes = neighboring(baseline3TimeToStation)
+        val baseline3TimeToStationThroughRelays = timeToTransmit.alignedMap(baseline3neighborTimes, Double::plus)
+        val baseline3Parent = baseline3TimeToStationThroughRelays.foldWithId(localId to POSITIVE_INFINITY) { current, id, time ->
             when {
-                current.second > distance -> id to distance
+                current.second > time -> id to time
                 else -> current
             }
-        }.first
+        }.first.inject(environment, "baseline3-parent")
+        dataRates[baseline3Parent].inject(environment, "baseline3-parent-data-rate")
         computeNonCooperativeDataRate("baseline3", streamingBitRate, environment, baseline3Parent, stationsNearby, dataRates)
 
         // Clustered
@@ -240,6 +240,10 @@ fun Aggregate<Int>.computeDataRates(
         }
     }.inject("dataRates")
 }
+
+fun Double.max3Mbit(): Double = coerceAtMost(3000.0)
+
+fun DataRate.max3Mbit(): Double = kiloBitsPerSecond.coerceAtMost(3000.0)
 
 fun main() {
     (0..50).map { it.kilometers to "APRS: ${aprs(it.kilometers)}, LoRa: ${lora(it.kilometers)}" }
