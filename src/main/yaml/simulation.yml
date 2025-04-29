@@ -134,7 +134,7 @@ terminate:
 
 launcher:
   parameters:
-    batch: [seed, 5g-probability]
+    batch: [seed, update-frequency, 5g-probability]
     showProgress: true
     autoStart: true
 

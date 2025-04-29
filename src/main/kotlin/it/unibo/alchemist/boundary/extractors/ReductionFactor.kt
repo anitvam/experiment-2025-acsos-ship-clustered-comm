@@ -58,10 +58,7 @@ class ReductionFactor @JvmOverloads constructor(
             }
             // Assign each member of the cluster the cluster ratio
             members.asSequence().map { it to clusterRatio }
-        }.toMap().also {
-            val mapped = it.mapKeys { it.key.id }
-            println(mapped)
-        }
+        }.toMap()
     }
 
     companion object {
