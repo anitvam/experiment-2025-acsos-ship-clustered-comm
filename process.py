@@ -190,7 +190,7 @@ if __name__ == '__main__':
     timeSamples = 100
     # time management
     minTime = 0
-    maxTime = 50
+    maxTime = 20000
     timeColumnName = 'time'
     logarithmicTime = False
     # One or more variables are considered random and "flattened"
@@ -230,17 +230,16 @@ if __name__ == '__main__':
         return r'\|' + x + r'\|'
 
     labels = {
-        'nodeCount': Measure(r'$n$', 'nodes'),
-        'harmonicCentrality[Mean]': Measure(f'${expected("H(x)")}$'),
-        'meanNeighbors': Measure(f'${expected(cardinality("N"))}$', 'nodes'),
-        'speed': Measure(r'$\|\vec{v}\|$', r'$m/s$'),
-        'msqer@harmonicCentrality[Max]': Measure(r'$\max{(' + mse(centrality_label) + ')}$'),
-        'msqer@harmonicCentrality[Min]': Measure(r'$\min{(' + mse(centrality_label) + ')}$'),
-        'msqer@harmonicCentrality[Mean]': Measure(f'${expected(mse(centrality_label))}$'),
-        'msqer@harmonicCentrality[StandardDeviation]': Measure(f'${stdev_of(mse(centrality_label))}$'),
-        'org:protelis:tutorial:distanceTo[max]': Measure(r'$m$', 'max distance'),
-        'org:protelis:tutorial:distanceTo[mean]': Measure(r'$m$', 'mean distance'),
-        'org:protelis:tutorial:distanceTo[min]': Measure(r'$m$', ',min distance'),
+        'reduction-factor[mean]': Measure('ReductionFactor := sum(inter-cluster)/sum(inter-cluster)'),
+        'reduction-factor[median]': Measure('ReductionFactor := sum(inter-cluster)/sum(inter-cluster)'),
+        'reduction-factor[StandardDeviation]': Measure('ReductionFactor := sum(inter-cluster)/sum(inter-cluster)'),
+        
+        # 'export-intra-cluster-relay-data-rate-not-leader[mean]': Measure('Intra-Cluster Data Rate'),
+        # 'export-intra-cluster-relay-data-rate-not-leader[variance]': Measure('Intra-Cluster Data Rate'),
+        # 'export-intra-cluster-relay-data-rate-not-leader[median]': Measure('Intra-Cluster Data Rate'),
+        # 'leader-to-relay-data-rate[mean]': Measure('Inter-Cluster Data Rate'),
+        # 'leader-to-relay-data-rate[variance]': Measure('Inter-Cluster Data Rate'),
+        # 'leader-to-relay-data-rate[median]': Measure('Inter-Cluster Data Rate'),
     }
     def derivativeOrMeasure(variable_name):
         if variable_name.endswith('dt'):
@@ -369,7 +368,7 @@ if __name__ == '__main__':
 #        ax.set_xlim(min(xdata), max(xdata))
         index = 0
         for (label, (data, error)) in ydata.items():
-#            print(f'plotting {data}\nagainst {xdata}')
+            print(f'plotting {data}\nagainst {xdata}')
             lines = ax.plot(xdata, data, label=label, color=colors(index / (len(ydata) - 1)) if colors else None, linewidth=linewidth)
             index += 1
             if error is not None:
@@ -422,6 +421,60 @@ if __name__ == '__main__':
     for experiment in experiments:
         current_experiment_means = means[experiment]
         current_experiment_errors = stdevs[experiment]
-        generate_all_charts(current_experiment_means, current_experiment_errors, basedir = f'{experiment}/all')
-        
+        #generate_all_charts(current_experiment_means, current_experiment_errors, basedir = f'{experiment}/all')
+    
 # Custom charting
+    from matplotlib.gridspec import SubplotSpec
+    
+    def compute_dimensions():
+        dimensions = {}
+        import fnmatch
+        allfiles = filter(lambda file: fnmatch.fnmatch(file, experiment + '_*.csv'), os.listdir(directory))
+        allfiles = [directory + '/' + name for name in allfiles]
+        allfiles.sort()
+        for file in allfiles:
+            dimensions = mergeDicts(dimensions, extractCoordinates(file))
+        return dimensions
+    
+    def custom_subplot(ax, ds, errors, evaluatingColumn, values, algorithm, color_value):
+       #evaluatingValues = ds.coords[evaluatingColumn].values
+       viridis = plt.colormaps['viridis']
+       for idx, x in enumerate(values):
+           
+           dataset = ds.sel({"g-probability": x}).to_dataframe()
+           print(dataset[evaluatingColumn])
+           errorsDataset = errors.sel({"g-probability": x}).to_dataframe()
+           sigmaMinus = dataset[evaluatingColumn] - errorsDataset[evaluatingColumn]
+           sigmaPlus = dataset[evaluatingColumn] + errorsDataset[evaluatingColumn]
+           ax[idx].plot(ds[timeColumnName], dataset[evaluatingColumn], label=algorithm, color=viridis(color_value), linewidth=2.0)
+           ax[idx].fill_between(ds[timeColumnName], sigmaMinus, sigmaPlus, color=viridis(color_value), alpha=0.2)
+           ax[idx].set_xlabel('Time ($ s $)')
+           #ax[idx].set_ylim(0, 1900)
+           #ax[idx].set_ylabel('Squared Distance Error ($ m^2 $)')
+           ax[idx].set_title(f'5G Probability {x}')
+           ax[idx].legend()
+           ax[idx].margins(x=0)
+    
+    def linechart_datarate(means, errors):
+    
+        dimensions = compute_dimensions()
+        updateFreq = dimensions['update-frequency']
+        gprob = dimensions['g-probability']
+        fig, axes = plt.subplots(3, len(gprob), figsize=(50, 6), sharey=False, layout="constrained")
+        axes[0][0].set_ylabel('Intra-Cluster Data Rate (Mbps)')
+        axes[1][0].set_ylabel('Inter-Cluster Data Rate (Mbps)')
+        axes[2][0].set_ylabel('Baselines Data Rate (Mbps)')
+        #axes[3][0].set_ylabel('Baseline2 Data Rate (Mbps)')
+        #axes[4][0].set_ylabel('Baseline3 Data Rate (Mbps)')
+
+        for freq in updateFreq: 
+            custom_subplot(axes[0], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-intra-cluster-relay-data-rate-not-leader[mean]', gprob, 'Mean Intra-Cluster Data Rate', 0.1)
+            custom_subplot(axes[1], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'leader-to-relay-data-rate[mean]', gprob, 'Mean Inter-Cluster Data Rate', 0.25)
+            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline1-data-rate[mean]', gprob, 'Mean Baseline1 Data Rate', 0.5)
+            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline2-data-rate[mean]', gprob, 'Mean Baseline2 Data Rate', 0.75)
+            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline3-data-rate[mean]', gprob, 'Mean Baseline3 Data Rate', 0.9)
+
+    linechart_datarate(means[experiment], stdevs[experiment] )
+        
+ 
+    

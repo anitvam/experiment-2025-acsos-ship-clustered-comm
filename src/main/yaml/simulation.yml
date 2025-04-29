@@ -163,7 +163,7 @@ export:
 #        aggregators: [ mean, variance, median ]
 #        value-filter: "onlyFinite"
       - type: ClustersOfOneElement # I'm counting the single occurrences of myLeader molecule ID value
-    # - type: LossFactor # Loss factor (amount of information received by the leader / amount of info. trasmitted)
+    # - type: LossFactor # Loss factor (amount of information received by the leader / amount of info. transmitted)
 
       - molecule: export-intra-cluster-relay-data-rate # Single-element data-rate (==data-rate) => To compare w.r.t baselines
         aggregators: [ mean, variance, median ]

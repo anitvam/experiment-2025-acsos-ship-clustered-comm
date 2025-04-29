@@ -134,7 +134,7 @@ fun Aggregate<Int>.entrypoint(
             .minBy(localId to POSITIVE_INFINITY) { it.second}
             .first
         val intraClusterDataRate = dataRates[idOfIntraClusterRelay].inject(environment, "intra-cluster-relay-data-rate")
-        (intraClusterDataRate.takeUnless { imLeader } ?: Double.NaN).inject(environment, "intra-cluster-relay-data-rate-not-leader")
+        val intraClusterDataRateNoLeaders = (intraClusterDataRate.takeUnless { imLeader } ?: Double.NaN).inject(environment, "intra-cluster-relay-data-rate-not-leader")
 
 
         val timesToStationAround = neighboring(clusteredTimeToStation).inject(environment, "timesToStationAround")
@@ -159,6 +159,7 @@ fun Aggregate<Int>.entrypoint(
         // Exported info
         // val myLeaderMolecule = SimpleMolecule("myLeader")
         // environment.environment.nodes.count { it.contents[myLeaderMolecule] == myLeader }.inject(environment, "cluster-size")
+
 
         return timeToTransmit[myRelay]
     }
