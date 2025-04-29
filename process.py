@@ -461,9 +461,9 @@ if __name__ == '__main__':
         updateFreq = dimensions['update-frequency']
         gprob = dimensions['g-probability']
         fig, axes = plt.subplots(3, len(gprob), figsize=(50, 6), sharey=False, layout="constrained")
-        axes[0][0].set_ylabel('Intra-Cluster Data Rate (Mbps)')
-        axes[1][0].set_ylabel('Inter-Cluster Data Rate (Mbps)')
-        axes[2][0].set_ylabel('Baselines Data Rate (Mbps)')
+        axes[0][0].set_ylabel('Intra-Cluster Data Rate (Kbps)')
+        axes[1][0].set_ylabel('Inter-Cluster Data Rate (Kbps)')
+        axes[2][0].set_ylabel('Baselines Data Rate (Kbps)')
         #axes[3][0].set_ylabel('Baseline2 Data Rate (Mbps)')
         #axes[4][0].set_ylabel('Baseline3 Data Rate (Mbps)')
 
@@ -474,7 +474,27 @@ if __name__ == '__main__':
             custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline2-data-rate[mean]', gprob, 'Mean Baseline2 Data Rate', 0.75)
             custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline3-data-rate[mean]', gprob, 'Mean Baseline3 Data Rate', 0.9)
 
+    def linechart_clusteredmetrics(means, errors):
+    
+        dimensions = compute_dimensions()
+        updateFreq = dimensions['update-frequency']
+        gprob = dimensions['g-probability']
+        fig, axes = plt.subplots(4, len(gprob), figsize=(50, 10), sharey=False, layout="constrained")
+        # axes[0][0].set_ylabel('Average Number of Clusters')
+        # axes[1][0].set_ylabel('Average Cluster Size')
+        # axes[2][0].set_ylabel('Number of Clusters composed of one element')
+        # axes[3][0].set_ylabel('Average Reduction Factor (sum(intercluster)/sum(intracluster))')
+        #axes[4][0].set_ylabel('Baseline3 Data Rate (Mbps)')
+
+        for freq in updateFreq: 
+            custom_subplot(axes[0], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'n_clusters', gprob, 'Average Number of Clusters', 0.1)
+            custom_subplot(axes[1], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'cluster-size[mean]', gprob, 'Average Cluster Size', 0.25)
+            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'clustersComposedOfOneElement', gprob, 'Number of Clusters composed of one element', 0.5)
+            custom_subplot(axes[3], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'reduction-factor[mean]', gprob, 'Average Reduction Factor (sum(intercluster)/sum(intracluster))', 0.75)
+           # custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline3-data-rate[mean]', gprob, 'Mean Baseline3 Data Rate', 0.9)
+    
     linechart_datarate(means[experiment], stdevs[experiment] )
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment])
         
  
     
