@@ -157,8 +157,8 @@ fun Aggregate<Int>.entrypoint(
             else -> Double.NaN
         }
         // Exported info
-        val myLeaderMolecule = SimpleMolecule("myLeader")
-        environment.environment.nodes.count { it.contents[myLeaderMolecule] == myLeader }.inject(environment, "cluster-size")
+        // val myLeaderMolecule = SimpleMolecule("myLeader")
+        // environment.environment.nodes.count { it.contents[myLeaderMolecule] == myLeader }.inject(environment, "cluster-size")
 
         return timeToTransmit[myRelay]
     }

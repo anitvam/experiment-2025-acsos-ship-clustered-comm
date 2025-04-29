@@ -30,8 +30,8 @@ variables:
     type: ArbitraryVariable
     parameters: [3, [0.001, 0.064, 0.1, 0.320, 3, 5]]
   seed: &seed
-    min: 100
-    max: 101
+    min: 0
+    max: 3
     step: 1
     default: 0
 
@@ -159,9 +159,9 @@ export:
         aggregators: [ mean, variance, median ]
         value-filter: "onlyFinite"
       - type: NumberOfClusters # Cluster Count: Number of occurrencies of the same value for "myLeader" molecule
-      - molecule: cluster-size # Cluster Size: Each node outputs the size of its cluster.
-        aggregators: [ mean, variance, median ]
-        value-filter: "onlyFinite"
+      - type: ClusterSize # Cluster Size: Each node outputs the size of its cluster.
+#        aggregators: [ mean, variance, median ]
+#        value-filter: "onlyFinite"
       - type: ClustersOfOneElement # I'm counting the single occurrences of myLeader molecule ID value
     # - type: LossFactor # Loss factor (amount of information received by the leader / amount of info. trasmitted)
 
