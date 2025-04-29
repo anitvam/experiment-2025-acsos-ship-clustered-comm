@@ -21,6 +21,7 @@ fun Any?.toInt(): Int = when (this) {
 }
 
 fun Any?.toBoolean(): Boolean = when (this) {
+    is Boolean -> this
     is Number -> this.toInt() != 0
     is String -> this.toBooleanStrict()
     is DataRate -> toInt().toBoolean()
