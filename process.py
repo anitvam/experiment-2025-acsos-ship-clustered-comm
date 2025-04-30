@@ -178,7 +178,7 @@ def beautifyValue(v):
 if __name__ == '__main__':
     # CONFIGURE SCRIPT
     # Where to find Alchemist data files
-    directory = 'data'
+    directory = 'data/v2'
     # Where to save charts
     output_directory = 'charts'
     # How to name the summary of the processed data
@@ -187,12 +187,13 @@ if __name__ == '__main__':
     experiments = ['clustered_comm']
     floatPrecision = '{: 0.3f}'
     # Number of time samples 
-    timeSamples = 100
+    timeSamples = 200
     # time management
     minTime = 0
-    maxTime = 20000
+    maxTime = 21600
     timeColumnName = 'time'
     logarithmicTime = False
+
     # One or more variables are considered random and "flattened"
     seedVars = ['seed', 'longseed']
     # Label mapping
@@ -276,7 +277,9 @@ if __name__ == '__main__':
                 # Collect all files for the experiment of interest
                 import fnmatch
                 allfiles = filter(lambda file: fnmatch.fnmatch(file, experiment + '_*.csv'), os.listdir(directory))
+                #print(allfiles)
                 allfiles = [directory + '/' + name for name in allfiles]
+                #print(allfiles)
                 allfiles.sort()
                 # From the file name, extract the independent variables
                 dimensions = {}
@@ -425,6 +428,8 @@ if __name__ == '__main__':
     
 # Custom charting
     from matplotlib.gridspec import SubplotSpec
+    from datetime import datetime, timedelta
+    import pytz
     
     def compute_dimensions():
         dimensions = {}
@@ -435,66 +440,136 @@ if __name__ == '__main__':
         for file in allfiles:
             dimensions = mergeDicts(dimensions, extractCoordinates(file))
         return dimensions
+        
+    def save_fig(fig, plt, name): 
+        fig.tight_layout()
+        by_time_output_directory = f'{output_directory}/'
+        Path(by_time_output_directory).mkdir(parents=True, exist_ok=True)
+        fig.savefig(f'{by_time_output_directory}/{name}.pdf')
+        plt.close(fig)
+
+    def seconds_to_datetime(seconds):
+        """
+        Converts seconds to datetime starting from August 18, 2022, 6:00 AM GMT+2 (with DST).
+        
+        Parameters:
+            seconds (int or float): Number of seconds since the start time.
     
-    def custom_subplot(ax, ds, errors, evaluatingColumn, values, algorithm, color_value):
+        Returns:
+            datetime: Resulting datetime object in Europe/Berlin timezone (with DST handled).
+        """
+        # Define the timezone (DST-aware)
+        tz = pytz.timezone('Europe/Berlin')  # GMT+02:00 in summer (DST)
+    
+        # Define the start datetime in local time
+        start_time = tz.localize(datetime(2022, 8, 18, 6, 0, 0))
+        # Add the seconds
+        result_time = start_time + timedelta(seconds=seconds)
+        formatted = result_time.strftime("%H:%M")
+        return formatted
+    
+    def custom_linechart_subplot(ax, ds, errors, evaluatingColumn, values, algorithm, color_value, isLastColumn=False):
        #evaluatingValues = ds.coords[evaluatingColumn].values
        viridis = plt.colormaps['viridis']
        for idx, x in enumerate(values):
-           
            dataset = ds.sel({"g-probability": x}).to_dataframe()
-           print(dataset[evaluatingColumn])
            errorsDataset = errors.sel({"g-probability": x}).to_dataframe()
            sigmaMinus = dataset[evaluatingColumn] - errorsDataset[evaluatingColumn]
            sigmaPlus = dataset[evaluatingColumn] + errorsDataset[evaluatingColumn]
            ax[idx].plot(ds[timeColumnName], dataset[evaluatingColumn], label=algorithm, color=viridis(color_value), linewidth=2.0)
            ax[idx].fill_between(ds[timeColumnName], sigmaMinus, sigmaPlus, color=viridis(color_value), alpha=0.2)
-           ax[idx].set_xlabel('Time ($ s $)')
-           #ax[idx].set_ylim(0, 1900)
+           if isLastColumn:
+               ax[idx].set_xlabel('Time ($ s $)')
+           ax[idx].set_xlim(0, 21600)
+           ax[idx].set_ylim(-0.1, None)
+           #ax[idx].set_yscale('symlog', linthresh=10)
            #ax[idx].set_ylabel('Squared Distance Error ($ m^2 $)')
-           ax[idx].set_title(f'5G Probability {x}')
-           ax[idx].legend()
-           ax[idx].margins(x=0)
+           ax[idx].set_title('$p_{5G}$' + f'= {x}')
+           #ax[idx].legend()
+           #ax[idx].margins(x=0)
+           ticks = np.arange(0.0, 21601, 3600)
+           custom_labels = [seconds_to_datetime(x) for x in ticks]
+           ax[idx].set_xticks(ticks)
+           ax[idx].set_xticklabels(custom_labels)  
     
     def linechart_datarate(means, errors):
-    
         dimensions = compute_dimensions()
         updateFreq = dimensions['update-frequency']
         gprob = dimensions['g-probability']
-        fig, axes = plt.subplots(3, len(gprob), figsize=(50, 6), sharey=False, layout="constrained")
-        axes[0][0].set_ylabel('Intra-Cluster Data Rate (Kbps)')
-        axes[1][0].set_ylabel('Inter-Cluster Data Rate (Kbps)')
-        axes[2][0].set_ylabel('Baselines Data Rate (Kbps)')
-        #axes[3][0].set_ylabel('Baseline2 Data Rate (Mbps)')
-        #axes[4][0].set_ylabel('Baseline3 Data Rate (Mbps)')
-
-        for freq in updateFreq: 
-            custom_subplot(axes[0], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-intra-cluster-relay-data-rate-not-leader[mean]', gprob, 'Mean Intra-Cluster Data Rate', 0.1)
-            custom_subplot(axes[1], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'leader-to-relay-data-rate[mean]', gprob, 'Mean Inter-Cluster Data Rate', 0.25)
-            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline1-data-rate[mean]', gprob, 'Mean Baseline1 Data Rate', 0.5)
-            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline2-data-rate[mean]', gprob, 'Mean Baseline2 Data Rate', 0.75)
-            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline3-data-rate[mean]', gprob, 'Mean Baseline3 Data Rate', 0.9)
-
-    def linechart_clusteredmetrics(means, errors):
-    
+        gprob = list(gprob)
+        gprob.sort()
+        updateFreq=[min(updateFreq), max(updateFreq)]
+        gprob = ['0.0', '0.01', '0.05']
+        fig, axes = plt.subplots(2, len(gprob), figsize=(15, 7), sharey=False, layout="constrained")
+        axes[0][0].set_ylabel(f'Update Frequency = {'{0:.4f}'.format(updateFreq[0])} Hz \n Data Rate (Kbps)')
+        axes[1][0].set_ylabel(f'Update Frequency = {'{0:.4f}'.format(updateFreq[1])} Hz \n Data Rate (Kbps)')
+        for idf, freq in enumerate(updateFreq): 
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'bcdr[mean]', gprob, 'Average Cluster Data Rate', 0.25, idf+1==len(updateFreq)) #0.25*(idf+1.5)
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b1dr[mean]', gprob, 'Average Baseline1 Data Rate', 0.5, idf+1==len(updateFreq)) #0.5
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b2dr[mean]', gprob, 'Average Baseline2 Data Rate', 0.75, idf+1==len(updateFreq)) #0.75
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b3dr[mean]', gprob, 'Average Baseline3 Data Rate', 0.9, idf+1==len(updateFreq)) #0.9
+        axes[0][0].legend()
+        save_fig(fig, plt, 'linechart_datarate')
+        
+    def linechart_clusteredmetrics(means, errors, metric, label):
+        dimensions = compute_dimensions()
+        #updateFreq = dimensions['update-frequency']
+        updateFreq = [0.2]
+        gprob = dimensions['g-probability']
+        fig, axes = plt.subplots(1, len(gprob), figsize=(70, 10), sharey=False, layout="constrained")
+        axes[0].set_ylabel(label)
+        for idf, freq in enumerate(updateFreq): 
+            custom_linechart_subplot(axes, means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), metric, gprob, label, 0.1, True)
+        save_fig(fig, plt, metric)
+        
+    def custom_barchart_subplot(ax, ds, errors, freq, probabilities, color_value):  
+       evaluatingColumns = {
+           "bcdr[mean]": f'Average Cluster Data Rate (Upd. Freq. {'{0:.2f}'.format(freq)})', 
+           "b1dr[mean]": f'Average Baseline1 Data Rate (Upd. Freq. {'{0:.2f}'.format(freq)})', 
+           "b2dr[mean]": f'Average Baseline2 Data Rate  (Upd. Freq. {'{0:.2f}'.format(freq)})',
+           "b3dr[mean]": f'Average Baseline3 Data Rate  (Upd. Freq. {'{0:.2f}'.format(freq)})'
+       }
+       viridis = plt.colormaps['viridis']
+       bar_width = 0.2
+       number_of_comparisons = len(evaluatingColumns)
+       range_comparisons = np.arange(number_of_comparisons)
+       x = probabilities
+       x_pos = np.arange(len(x))
+       for i, (key, value) in enumerate(evaluatingColumns.items()):
+           average = []
+           std_dev = []
+           for idp, prob in enumerate(probabilities):
+               data = ds.sel({"g-probability": prob})[key]
+               data = data.isel(time=slice(1, None)) #Drop 1st value
+               average.append(np.mean(data))
+               std_dev.append(np.std(data))
+           offset = (i - number_of_comparisons / 2) * bar_width + bar_width / 2
+           ax.bar(x_pos + offset, average, bar_width, yerr=std_dev, label=value, color=viridis(0.25*(i+1.5)))
+           ax.set_xticks(x_pos, probabilities)
+           ax.legend()
+           ax.set_ylabel('Data Rate (Kbps)')
+           
+    def barchart_datarate(means, errors):
         dimensions = compute_dimensions()
         updateFreq = dimensions['update-frequency']
         gprob = dimensions['g-probability']
-        fig, axes = plt.subplots(4, len(gprob), figsize=(50, 10), sharey=False, layout="constrained")
-        # axes[0][0].set_ylabel('Average Number of Clusters')
-        # axes[1][0].set_ylabel('Average Cluster Size')
-        # axes[2][0].set_ylabel('Number of Clusters composed of one element')
-        # axes[3][0].set_ylabel('Average Reduction Factor (sum(intercluster)/sum(intracluster))')
-        #axes[4][0].set_ylabel('Baseline3 Data Rate (Mbps)')
-
-        for freq in updateFreq: 
-            custom_subplot(axes[0], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'n_clusters', gprob, 'Average Number of Clusters', 0.1)
-            custom_subplot(axes[1], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'cluster-size[mean]', gprob, 'Average Cluster Size', 0.25)
-            custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'clustersComposedOfOneElement', gprob, 'Number of Clusters composed of one element', 0.5)
-            custom_subplot(axes[3], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'reduction-factor[mean]', gprob, 'Average Reduction Factor (sum(intercluster)/sum(intracluster))', 0.75)
-           # custom_subplot(axes[2], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'export-baseline3-data-rate[mean]', gprob, 'Mean Baseline3 Data Rate', 0.9)
+        gprob = list(gprob)
+        gprob.sort()
+        fig, axes = plt.subplots(len(updateFreq), 1, figsize=(20, 20), sharey=False, layout="constrained")
+        axes[len(updateFreq)-1].set_xlabel("$p_{5G}$")    
+        for idf, freq in enumerate(updateFreq): 
+            custom_barchart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), freq, gprob, 0.25*(idf+1.5))          
+        
+        save_fig(fig, plt,'barchart_datarate')
+    
     
     linechart_datarate(means[experiment], stdevs[experiment] )
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment])
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  f'Average Number of Clusters')
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  f'Average Cluster Size')
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  f'Number of Clusters composed of one element')
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  f'Average Reduction Factor (sum(intercluster)/sum(intracluster))')
+    barchart_datarate(means[experiment], stdevs[experiment])
+    
         
  
     
