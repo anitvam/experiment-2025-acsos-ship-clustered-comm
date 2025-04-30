@@ -52,10 +52,10 @@ fun Aggregate<Int>.entrypoint(
         .inject(environment, "distance")
     val is5gAntenna: Field<Int, Boolean> = neighboring(environment.isDefined("5gAntenna"))
     val thisIsA5gAntenna = is5gAntenna.localValue
+    val dataRates: Field<Int, DataRate> = computeDataRates(environment, distances)
     // Once data rates have been established, 5g towers are cut off the computation,
     // they just relay the communication
     if (!thisIsA5gAntenna) { //
-        val dataRates: Field<Int, DataRate> = computeDataRates(environment, distances)
         dataRates.max(base = disconnected).inject(environment, "max-data-rate")
         val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject(environment, "metric")
 
