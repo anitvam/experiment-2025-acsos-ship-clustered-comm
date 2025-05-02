@@ -574,6 +574,8 @@ if __name__ == '__main__':
         ds = means.sel({"update-frequency": freq })
         errors = errors.sel({"update-frequency": freq })
         
+        vcolors = map(lambda x: viridis(0.15+(x*0.13)), x_pos)
+        
         average = []
         std_dev = []
         for idx, x in enumerate(gprob):
@@ -582,9 +584,11 @@ if __name__ == '__main__':
             average.append(np.mean(data))
             std_dev.append(np.std(data))
             
-        vcolor = viridis(0.5)
+        
         axes.set_xlim(x_pos[0]-0.5, x_pos[-1]+0.5)
-        axes.bar(x_pos, average, width=bar_width, yerr=std_dev, label=f'$p_{'5G'}$ = {x}', color=vcolor)
+        axes.bar(x_pos, average, width=bar_width, yerr=std_dev, label=f'$p_{'5G'}$ = {x}')
+        for patch,color in zip(axes.patches,vcolors):
+            patch.set_facecolor(color)
         axes.set_xticks(x_pos, gprob)        
         axes.set_xlabel(f'$p_{'5G'}$')
         axes.set_title(label)
@@ -679,14 +683,14 @@ if __name__ == '__main__':
     
     
     linechart_datarate(means[experiment], stdevs[experiment] )
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Average Number of Clusters', None, None)
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Average Cluster Size', None, None)
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Number of Clusters composed of one element', None, None)
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Average Reduction Factor', 0.7, 1)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Average Number of Clusters', None, None)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Average Cluster Size', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Mean of Clusters composed of one element', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
     barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Number of Clusters composed of one element', None, None)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Average Reduction Factor', 0.7, 1)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
     barchart_datarate(means[experiment], stdevs[experiment])
     plot_metric_chart()
     
