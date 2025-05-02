@@ -20,6 +20,11 @@ fun Any?.toInt(): Int = when (this) {
     else -> 0
 }
 
+fun Any?.isNan(): Boolean = when (this) {
+    is Double.NaN -> true
+    else -> false
+}
+
 fun Any?.toBoolean(): Boolean = when (this) {
     is Boolean -> this
     is Number -> this.toInt() != 0

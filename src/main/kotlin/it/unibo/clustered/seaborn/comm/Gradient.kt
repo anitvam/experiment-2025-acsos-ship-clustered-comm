@@ -59,8 +59,6 @@ fun Aggregate<Int>.entrypoint(
         dataRates.max(base = disconnected).inject(environment, "max-data-rate")
         val timeToTransmit = dataRates.map { it.timeToTransmitOneMb }.inject(environment, "metric")
 
-
-
         // Baseline 1: direct communication with the station only
         val stationsNearby: Field<Int, Boolean> = neighboring(groundStation)
         val baseline1 = stationsNearby
@@ -123,16 +121,30 @@ fun Aggregate<Int>.entrypoint(
         ).inject(environment, "myLeader")
         val imLeader = myLeader == localId
         imLeader.inject(environment, "imLeader")
-        val distanceToLeader = distanceTo(
-            imLeader,
-            metric = timeToTransmit,
-            isRiemannianManifold = false,
-        ).inject(environment, "distanceToLeader")
+//        val distanceToLeader = distanceTo(
+//            imLeader,
+//            metric = timeToTransmit,
+//            isRiemannianManifold = false,
+//        ).inject(environment, "distanceToLeader")
+        val distanceToLeader = alignedOn(myLeader) {
+            distanceTo(
+                imLeader,
+                metric = timeToTransmit,
+                isRiemannianManifold = false,
+            ).inject(environment, "distanceToLeader")
+        }
         val idOfIntraClusterRelay = neighboring(distanceToLeader)
             .alignedMap(timeToTransmit, Double::plus)
+            .alignedMap(neighboring(myLeader)) { distance, leader ->
+                when (leader) {
+                    myLeader -> distance
+                    else -> POSITIVE_INFINITY
+                }
+            }
             .mapWithId { id, time -> id to time }
             .minBy(localId to POSITIVE_INFINITY) { it.second}
             .first
+            .inject(environment, "intra-cluster-relay")
         val intraClusterDataRate = dataRates[idOfIntraClusterRelay].inject(environment, "intra-cluster-relay-data-rate")
         val intraClusterDataRateNoLeaders = (intraClusterDataRate.takeUnless { imLeader } ?: Double.NaN).inject(environment, "intra-cluster-relay-data-rate-not-leader")
 

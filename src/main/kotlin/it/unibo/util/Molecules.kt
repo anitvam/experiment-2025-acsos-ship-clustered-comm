@@ -1,4 +1,4 @@
-package it.unibo.alchemist.boundary.extractors
+package it.unibo.util
 
 import it.unibo.alchemist.model.molecules.SimpleMolecule
 
@@ -6,7 +6,9 @@ val fiveG = SimpleMolecule("5gAntenna")
 val station = SimpleMolecule("station")
 val leader = SimpleMolecule("myLeader")
 val iAmLeader = SimpleMolecule("imLeader")
+val iAmRelay = SimpleMolecule("imRelay")
 val relay = SimpleMolecule("myRelay")
+val intraClusterRelay = SimpleMolecule("intra-cluster-relay")
 val intraClusterDR = SimpleMolecule("export-intra-cluster-relay-data-rate-not-leader")
 val interClusterDR = SimpleMolecule("leader-to-relay-data-rate")
 val baseline1DR = SimpleMolecule("baseline1-data-rate")

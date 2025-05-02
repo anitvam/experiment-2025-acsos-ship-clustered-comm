@@ -5,13 +5,16 @@ import it.unibo.alchemist.model.Actionable
 import it.unibo.alchemist.model.Environment
 import it.unibo.alchemist.model.Node
 import it.unibo.alchemist.model.Time
+import it.unibo.util.interClusterDR
+import it.unibo.util.intraClusterDR
+import it.unibo.util.leader
+import it.unibo.util.station
 import it.unibo.util.toDouble
 import it.unibo.util.toInt
 import kotlin.String
 import kotlin.collections.List
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.get
 
 /**
  * Reduction factor := sum(intra-cluster-data-rate)/sum(inter-cluster-data-rate)
