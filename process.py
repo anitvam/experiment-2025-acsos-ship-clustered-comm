@@ -479,7 +479,7 @@ if __name__ == '__main__':
            ax[idx].plot(ds[timeColumnName], dataset[evaluatingColumn], label=algorithm, color=viridis(color_value), linewidth=2.0)
            ax[idx].fill_between(ds[timeColumnName], sigmaMinus, sigmaPlus, color=viridis(color_value), alpha=0.2)
            if isLastColumn:
-               ax[idx].set_xlabel('Time ($ s $)')
+               ax[idx].set_xlabel('Time ($HH:MM$)')
            ax[idx].set_xlim(0, 21600)
            ax[idx].set_ylim(-0.1, None)
            #ax[idx].set_yscale('symlog', linthresh=10)
@@ -536,10 +536,10 @@ if __name__ == '__main__':
             sigmaMinus = dataset[metric] - errorsDataset[metric]
             sigmaPlus = dataset[metric] + errorsDataset[metric]
             vcolor = viridis(0.15+(idx*0.13))
-            axes.plot(ds[timeColumnName], dataset[metric], label=f'$p_{'5G'}$ = {x}', color=vcolor, linewidth=2.0)
+            axes.plot(ds[timeColumnName], dataset[metric], label='$p_{5G}$' +f' = {x}', color=vcolor, linewidth=2.0)
             axes.fill_between(ds[timeColumnName], sigmaMinus, sigmaPlus, color=vcolor, alpha=0.2)
         
-        axes.set_xlabel('Time ($ s $)')
+        axes.set_xlabel('Time ($HH:MM$)')
         axes.set_xlim(0, 21600)
         axes.set_ylim(-0.1, None)
         #ax[idx].set_yscale('symlog', linthresh=10)
@@ -563,7 +563,7 @@ if __name__ == '__main__':
         updateFreq = [0.2]
         freq = 0.2
         gprob = dimensions['g-probability']
-        fig, axes = plt.subplots(1, 1, figsize=(10, 5), sharey=False, layout="constrained")
+        fig, axes = plt.subplots(1, 1, figsize=(5, 2.5), sharey=False, layout="constrained")
         viridis = plt.colormaps['viridis']
         gprob = list(gprob)
         gprob.sort()
@@ -586,11 +586,11 @@ if __name__ == '__main__':
             
         
         axes.set_xlim(x_pos[0]-0.5, x_pos[-1]+0.5)
-        axes.bar(x_pos, average, width=bar_width, yerr=std_dev, label=f'$p_{'5G'}$ = {x}')
+        axes.bar(x_pos, average, width=bar_width, yerr=std_dev, label='$p_{5G}$'+f' = {x}')
         for patch,color in zip(axes.patches,vcolors):
             patch.set_facecolor(color)
         axes.set_xticks(x_pos, gprob)        
-        axes.set_xlabel(f'$p_{'5G'}$')
+        axes.set_xlabel("$p_{5G}$")
         axes.set_title(label)
         axes.set_ylim(lowLim, upLim)
         save_fig(fig, plt, "barchart_"+metric)
@@ -649,23 +649,23 @@ if __name__ == '__main__':
         df = pd.read_csv("data/metric_data.csv")
         viridis = plt.colormaps['viridis']
         
-        plt.figure(figsize=(10, 7))
+        plt.figure(figsize=(8, 6))
         widthOfLine = 4
-        plt.plot(df["x"], df["y_wifi"], label="Wi-Fi", linewidth=widthOfLine, color=viridis(0.2))
-        plt.plot(df["x"], df["y_aprs"], label="APRS", linewidth=widthOfLine, color=viridis(0.4))
-        plt.plot(df["x"], df["y_lora"], label="LoraWAN", linewidth=widthOfLine, color=viridis(0.6))
-        plt.plot(df["x"], df["y_midband5g"], label="Midband 5G", linewidth=widthOfLine, color=viridis(8))
+        plt.plot(df["x"], df["y_wifi"], label="Wi-Fi", linewidth=widthOfLine, color=viridis(0.9))
+        plt.plot(df["x"], df["y_aprs"], label="APRS", linewidth=widthOfLine, color=viridis(0.65))
+        plt.plot(df["x"], df["y_lora"], label="LoraWAN", linewidth=widthOfLine, color=viridis(0.4))
+        plt.plot(df["x"], df["y_midband5g"], label="Midband 5G", linewidth=widthOfLine, color=viridis(0.1))
         
-        def addHorizontalAxe(yValue, label, position=10000):
+        def addHorizontalAxe(yValue, label, position=6000):
             plt.axhline(y=yValue, color='black', linestyle='--')
-            plt.text(x=position, y=yValue + 0.00000005, s=label, color='black', fontsize=10, verticalalignment='bottom' )
+            plt.text(x=position, y=yValue + 0.00000001, s=label, color='black', fontsize=10, verticalalignment='bottom' )
         
-        addHorizontalAxe(5.0, "Full-HD video (~5Mbps)")
-        addHorizontalAxe(2.5, "HD-Ready audio (~2.5Mbps)")
-        addHorizontalAxe(0.320, "High-Quality audio (~320kbps)")
+        addHorizontalAxe(5.0, "Full-HD video (~5Mbps)", 1.5)
+        addHorizontalAxe(2.5, "HD-Ready audio (~2.5Mbps)", 1.5)
+        addHorizontalAxe(0.320, "High-Quality audio (~320kbps)", 1.5)
         addHorizontalAxe(0.064, "Low-Quality audio (~64kbps)")
         addHorizontalAxe(0.032, "Speech only audio (~32kbps)")
-        addHorizontalAxe(0.100, "Rich text data (~100kbps)")
+        addHorizontalAxe(0.100, "Rich text data (~100kbps)", 1.5)
         addHorizontalAxe(0.001, "Position, Identification, Direction (1kbps)", 1.5)
         addHorizontalAxe(0.0001, "Keep Alive Message (10bps)", 1.5)
                 
@@ -682,16 +682,16 @@ if __name__ == '__main__':
 
     
     
-    linechart_datarate(means[experiment], stdevs[experiment] )
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
-    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
-    barchart_datarate(means[experiment], stdevs[experiment])
+    #linechart_datarate(means[experiment], stdevs[experiment] )
+    #linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
+    #linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
+    #linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
+    # linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
+    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
+    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
+    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
+    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
+    # barchart_datarate(means[experiment], stdevs[experiment])
     plot_metric_chart()
     
     
