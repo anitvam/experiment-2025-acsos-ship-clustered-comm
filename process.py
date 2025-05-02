@@ -178,7 +178,7 @@ def beautifyValue(v):
 if __name__ == '__main__':
     # CONFIGURE SCRIPT
     # Where to find Alchemist data files
-    directory = 'data/v2'
+    directory = 'data'
     # Where to save charts
     output_directory = 'charts'
     # How to name the summary of the processed data
@@ -429,6 +429,7 @@ if __name__ == '__main__':
 # Custom charting
     from matplotlib.gridspec import SubplotSpec
     from datetime import datetime, timedelta
+    import pandas as pd
     import pytz
     
     def compute_dimensions():
@@ -443,9 +444,8 @@ if __name__ == '__main__':
         
     def save_fig(fig, plt, name): 
         fig.tight_layout()
-        by_time_output_directory = f'{output_directory}/'
-        Path(by_time_output_directory).mkdir(parents=True, exist_ok=True)
-        fig.savefig(f'{by_time_output_directory}/{name}.pdf')
+        Path(output_directory).mkdir(parents=True, exist_ok=True)
+        fig.savefig(f'{output_directory}/{name}.pdf')
         plt.close(fig)
 
     def seconds_to_datetime(seconds):
@@ -500,34 +500,103 @@ if __name__ == '__main__':
         gprob.sort()
         updateFreq=[min(updateFreq), max(updateFreq)]
         gprob = ['0.0', '0.01', '0.05']
-        fig, axes = plt.subplots(2, len(gprob), figsize=(15, 7), sharey=False, layout="constrained")
-        axes[0][0].set_ylabel(f'Update Frequency = {'{0:.4f}'.format(updateFreq[0])} Hz \n Data Rate (Kbps)')
-        axes[1][0].set_ylabel(f'Update Frequency = {'{0:.4f}'.format(updateFreq[1])} Hz \n Data Rate (Kbps)')
+        fig, axes = plt.subplots(2, len(gprob), figsize=(11, 5), sharey=False, layout="constrained")
+        axes[0][0].set_ylabel(f'Update Freq. = {'{0:.4f}'.format(updateFreq[0])}Hz \n Data Rate (Kbps)')
+        axes[1][0].set_ylabel(f'Update Freq. = {'{0:.1f}'.format(updateFreq[1])}Hz \n Data Rate (Kbps)')
         for idf, freq in enumerate(updateFreq): 
-            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'bcdr[mean]', gprob, 'Average Cluster Data Rate', 0.25, idf+1==len(updateFreq)) #0.25*(idf+1.5)
-            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b1dr[mean]', gprob, 'Average Baseline1 Data Rate', 0.5, idf+1==len(updateFreq)) #0.5
-            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b2dr[mean]', gprob, 'Average Baseline2 Data Rate', 0.75, idf+1==len(updateFreq)) #0.75
-            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b3dr[mean]', gprob, 'Average Baseline3 Data Rate', 0.9, idf+1==len(updateFreq)) #0.9
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'bcdr[mean]', gprob, 'Mean $CSC$ $DR$', 0.25, idf+1==len(updateFreq)) #0.25*(idf+1.5)
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b1dr[mean]', gprob, 'Mean $baseline$ $DR$', 0.5, idf+1==len(updateFreq)) #0.5
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b2dr[mean]', gprob, 'Mean $Dist-MR$ $DR$', 0.75, idf+1==len(updateFreq)) #0.75
+            custom_linechart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), 'b3dr[mean]', gprob, 'Mean $DR-MR$ $DR$', 0.9, idf+1==len(updateFreq)) #0.9
+        
+        for idf, f in enumerate(updateFreq): 
+            for idp, p in enumerate(gprob):
+                axes[idf][idp].set_ylim(1000, 3000)
+        
         axes[0][0].legend()
+         
         save_fig(fig, plt, 'linechart_datarate')
         
-    def linechart_clusteredmetrics(means, errors, metric, label):
+    def linechart_clusteredmetrics(means, errors, metric, label, lowLim, upLim):
         dimensions = compute_dimensions()
-        #updateFreq = dimensions['update-frequency']
         updateFreq = [0.2]
+        freq = 0.2
         gprob = dimensions['g-probability']
-        fig, axes = plt.subplots(1, len(gprob), figsize=(70, 10), sharey=False, layout="constrained")
-        axes[0].set_ylabel(label)
-        for idf, freq in enumerate(updateFreq): 
-            custom_linechart_subplot(axes, means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), metric, gprob, label, 0.1, True)
-        save_fig(fig, plt, metric)
+        fig, axes = plt.subplots(1, 1, figsize=(10, 5), sharey=False, layout="constrained")
+        viridis = plt.colormaps['viridis']
+        gprob = list(gprob)
+        gprob.sort()
+        # for idp, prob in enumerate(gprob): 
+        #    custom_linechart_subplot(axes, means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), metric, updateFreq, label, 0.1, True)
+        ds = means.sel({"update-frequency": freq })
+        errors = errors.sel({"update-frequency": freq })
+        for idx, x in enumerate(gprob):
+            dataset = ds.sel({"g-probability": x}).to_dataframe()
+            errorsDataset = errors.sel({"g-probability": x}).to_dataframe()
+            sigmaMinus = dataset[metric] - errorsDataset[metric]
+            sigmaPlus = dataset[metric] + errorsDataset[metric]
+            vcolor = viridis(0.15+(idx*0.13))
+            axes.plot(ds[timeColumnName], dataset[metric], label=f'$p_{'5G'}$ = {x}', color=vcolor, linewidth=2.0)
+            axes.fill_between(ds[timeColumnName], sigmaMinus, sigmaPlus, color=vcolor, alpha=0.2)
+        
+        axes.set_xlabel('Time ($ s $)')
+        axes.set_xlim(0, 21600)
+        axes.set_ylim(-0.1, None)
+        #ax[idx].set_yscale('symlog', linthresh=10)
+        #ax[idx].set_ylabel('Squared Distance Error ($ m^2 $)')
+        axes.set_title(label)
+        #ax[idx].legend()
+        #ax[idx].margins(x=0)
+        ticks = np.arange(0.0, 21601, 3600)
+        custom_labels = [seconds_to_datetime(x) for x in ticks]
+        axes.set_xticks(ticks)
+        axes.set_xticklabels(custom_labels)
+        
+        axes.set_ylim(lowLim, upLim)
+        
+        axes.legend()
+        
+        save_fig(fig, plt, "linechart_"+metric)
+        
+    def barchart_clusteredmetrics(means, errors, metric, label, lowLim, upLim):
+        dimensions = compute_dimensions()
+        updateFreq = [0.2]
+        freq = 0.2
+        gprob = dimensions['g-probability']
+        fig, axes = plt.subplots(1, 1, figsize=(10, 5), sharey=False, layout="constrained")
+        viridis = plt.colormaps['viridis']
+        gprob = list(gprob)
+        gprob.sort()
+        
+        bar_width = 0.9
+        x = gprob
+        x_pos = np.arange(len(x))
+        ds = means.sel({"update-frequency": freq })
+        errors = errors.sel({"update-frequency": freq })
+        
+        average = []
+        std_dev = []
+        for idx, x in enumerate(gprob):
+            data = ds.sel({"g-probability": x})[metric]
+            data = data.isel(time=slice(1, None)) #Drop 1st value
+            average.append(np.mean(data))
+            std_dev.append(np.std(data))
+            
+        vcolor = viridis(0.5)
+        axes.set_xlim(x_pos[0]-0.5, x_pos[-1]+0.5)
+        axes.bar(x_pos, average, width=bar_width, yerr=std_dev, label=f'$p_{'5G'}$ = {x}', color=vcolor)
+        axes.set_xticks(x_pos, gprob)        
+        axes.set_xlabel(f'$p_{'5G'}$')
+        axes.set_title(label)
+        axes.set_ylim(lowLim, upLim)
+        save_fig(fig, plt, "barchart_"+metric)
         
     def custom_barchart_subplot(ax, ds, errors, freq, probabilities, color_value):  
        evaluatingColumns = {
-           "bcdr[mean]": f'Average Cluster Data Rate (Upd. Freq. {'{0:.2f}'.format(freq)})', 
-           "b1dr[mean]": f'Average Baseline1 Data Rate (Upd. Freq. {'{0:.2f}'.format(freq)})', 
-           "b2dr[mean]": f'Average Baseline2 Data Rate  (Upd. Freq. {'{0:.2f}'.format(freq)})',
-           "b3dr[mean]": f'Average Baseline3 Data Rate  (Upd. Freq. {'{0:.2f}'.format(freq)})'
+           "bcdr[mean]": 'Mean $CSC$ $DR$', 
+           "b1dr[mean]": 'Mean $baseline$ $DR$', 
+           "b2dr[mean]": 'Mean $Dist-MR$ $DR$',
+           "b3dr[mean]": 'Mean $DR-MR$ $DR$'
        }
        viridis = plt.colormaps['viridis']
        bar_width = 0.2
@@ -544,31 +613,83 @@ if __name__ == '__main__':
                average.append(np.mean(data))
                std_dev.append(np.std(data))
            offset = (i - number_of_comparisons / 2) * bar_width + bar_width / 2
+           ax.set_xlim(x_pos[0]-(2*bar_width), x_pos[-1]+(2*bar_width))
            ax.bar(x_pos + offset, average, bar_width, yerr=std_dev, label=value, color=viridis(0.25*(i+1.5)))
            ax.set_xticks(x_pos, probabilities)
-           ax.legend()
-           ax.set_ylabel('Data Rate (Kbps)')
+           #ax.legend()
+           
+          
            
     def barchart_datarate(means, errors):
         dimensions = compute_dimensions()
-        updateFreq = dimensions['update-frequency']
+        updateFreq = list(dimensions['update-frequency'])
         gprob = dimensions['g-probability']
         gprob = list(gprob)
         gprob.sort()
-        fig, axes = plt.subplots(len(updateFreq), 1, figsize=(20, 20), sharey=False, layout="constrained")
-        axes[len(updateFreq)-1].set_xlabel("$p_{5G}$")    
+        fig, axes = plt.subplots(len(updateFreq), 1, figsize=(8, 8), sharey=False, layout="constrained")
+        axes[len(updateFreq)-1].set_xlabel("$p_{5G}$")
+        
         for idf, freq in enumerate(updateFreq): 
-            custom_barchart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), freq, gprob, 0.25*(idf+1.5))          
+            custom_barchart_subplot(axes[idf], means.sel({"update-frequency": freq }), errors.sel({"update-frequency": freq }), freq, gprob, 0.25*(idf+1.5))    
+        axes[len(updateFreq)-1].legend(loc='lower right', framealpha=0.95)
+        axes[0].set_ylabel(f'Update Freq. = {'{0:.4f}'.format(updateFreq[0])}Hz\nData Rate (Kbps)')
+        axes[1].set_ylabel(f'Update Freq. = {'{0:.1f}'.format(updateFreq[1])}Hz\nData Rate (Kbps)')
+        axes[2].set_ylabel(f'Update Freq. = {'{0:.1f}'.format(updateFreq[2])}Hz\nData Rate (Kbps)')
+        
         
         save_fig(fig, plt,'barchart_datarate')
+        
+        
+        
+    def plot_metric_chart():
+        df = pd.read_csv("data/metric_data.csv")
+        viridis = plt.colormaps['viridis']
+        
+        plt.figure(figsize=(10, 7))
+        widthOfLine = 4
+        plt.plot(df["x"], df["y_wifi"], label="Wi-Fi", linewidth=widthOfLine, color=viridis(0.2))
+        plt.plot(df["x"], df["y_aprs"], label="APRS", linewidth=widthOfLine, color=viridis(0.4))
+        plt.plot(df["x"], df["y_lora"], label="LoraWAN", linewidth=widthOfLine, color=viridis(0.6))
+        plt.plot(df["x"], df["y_midband5g"], label="Midband 5G", linewidth=widthOfLine, color=viridis(8))
+        
+        def addHorizontalAxe(yValue, label, position=10000):
+            plt.axhline(y=yValue, color='black', linestyle='--')
+            plt.text(x=position, y=yValue + 0.00000005, s=label, color='black', fontsize=10, verticalalignment='bottom' )
+        
+        addHorizontalAxe(5.0, "Full-HD video (~5Mbps)")
+        addHorizontalAxe(2.5, "HD-Ready audio (~2.5Mbps)")
+        addHorizontalAxe(0.320, "High-Quality audio (~320kbps)")
+        addHorizontalAxe(0.064, "Low-Quality audio (~64kbps)")
+        addHorizontalAxe(0.032, "Speech only audio (~32kbps)")
+        addHorizontalAxe(0.100, "Rich text data (~100kbps)")
+        addHorizontalAxe(0.001, "Position, Identification, Direction (1kbps)", 1.5)
+        addHorizontalAxe(0.0001, "Keep Alive Message (10bps)", 1.5)
+                
+        plt.yscale('symlog', linthresh=0.001)
+        plt.xscale("log")
+        plt.legend(loc="upper right")
+        plt.xlim(1.0, 60000.0)
+        plt.ylim(-0.0001, 10000.0)
+        plt.xlabel("Distance (meters)")
+        plt.ylabel("Data Rate (Mbps)")
+        plt.tight_layout()
+        Path(output_directory).mkdir(parents=True, exist_ok=True)
+        plt.savefig(f'{output_directory}/metric_chart.pdf')
+
     
     
     linechart_datarate(means[experiment], stdevs[experiment] )
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  f'Average Number of Clusters')
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  f'Average Cluster Size')
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  f'Number of Clusters composed of one element')
-    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  f'Average Reduction Factor (sum(intercluster)/sum(intracluster))')
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Average Number of Clusters', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Average Cluster Size', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Number of Clusters composed of one element', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Average Reduction Factor', 0.7, 1)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Average Number of Clusters', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Average Cluster Size', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Number of Clusters composed of one element', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Average Reduction Factor', 0.7, 1)
     barchart_datarate(means[experiment], stdevs[experiment])
+    plot_metric_chart()
+    
     
         
  
