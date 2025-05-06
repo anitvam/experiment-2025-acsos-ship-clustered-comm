@@ -1,5 +1,5 @@
 # Experiments for Robust Communication through Collective Adaptive Relay Schemes for Maritime Vessels
-# Submitted for [ACSOS 2025](https://conf.researchr.org/home/acsos-2025) conference
+### Submitted for [ACSOS 2025](https://conf.researchr.org/home/acsos-2025) conference
 
 ## Reproduce the entire experiment
 
