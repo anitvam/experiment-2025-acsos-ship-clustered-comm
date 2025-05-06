@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+            <trk>
+                <name>anon0132</name>
+                <trkseg>
+                    <trkpt lat="54.40216833333333" lon="10.216503333333332">
+    <ele>0</ele>
+    <time>2022-08-18T03:59:43Z</time>
+</trkpt>
+<trkpt lat="54.40219333333334" lon="10.216531666666667">
+    <ele>0</ele>
+    <time>2022-08-18T05:17:43Z</time>
+</trkpt>
+<trkpt lat="54.40215666666666" lon="10.21654">
+    <ele>0</ele>
+    <time>2022-08-18T06:14:44Z</time>
+</trkpt>
+<trkpt lat="54.40216" lon="10.216518333333333">
+    <ele>0</ele>
+    <time>2022-08-18T07:26:42Z</time>
+</trkpt>
+<trkpt lat="54.40215666666666" lon="10.216523333333333">
+    <ele>0</ele>
+    <time>2022-08-18T08:11:42Z</time>
+</trkpt>
+<trkpt lat="54.40213666666667" lon="10.216526666666665">
+    <ele>0</ele>
+    <time>2022-08-18T08:17:42Z</time>
+</trkpt>
+<trkpt lat="54.40216" lon="10.216523333333333">
+    <ele>0</ele>
+    <time>2022-08-18T14:32:44Z</time>
+</trkpt>
+<trkpt lat="54.40216833333333" lon="10.216528333333335">
+    <ele>0</ele>
+    <time>2022-08-18T14:35:42Z</time>
+</trkpt>
+<trkpt lat="54.40217" lon="10.216524999999999">
+    <ele>0</ele>
+    <time>2022-08-18T16:11:42Z</time>
+</trkpt>
+<trkpt lat="54.40216" lon="10.216516666666667">
+    <ele>0</ele>
+    <time>2022-08-18T16:35:42Z</time>
+</trkpt>
+<trkpt lat="54.402161666666665" lon="10.216531666666667">
+    <ele>0</ele>
+    <time>2022-08-18T18:53:42Z</time>
+</trkpt>
+<trkpt lat="54.40215166666667" lon="10.216550000000002">
+    <ele>0</ele>
+    <time>2022-08-18T18:59:42Z</time>
+</trkpt>
+<trkpt lat="54.402161666666665" lon="10.216515">
+    <ele>0</ele>
+    <time>2022-08-18T19:35:43Z</time>
+</trkpt>
+<trkpt lat="54.40215" lon="10.216479999999999">
+    <ele>0</ele>
+    <time>2022-08-18T21:05:43Z</time>
+</trkpt>
+<trkpt lat="54.402188333333335" lon="10.216556666666666">
+    <ele>0</ele>
+    <time>2022-08-18T21:41:43Z</time>
+</trkpt>
+<trkpt lat="54.402166666666666" lon="10.21653">
+    <ele>0</ele>
+    <time>2022-08-18T22:23:43Z</time>
+</trkpt>
+<trkpt lat="54.40216833333333" lon="10.216545">
+    <ele>0</ele>
+    <time>2022-08-18T22:47:42Z</time>
+</trkpt>
+<trkpt lat="54.402165" lon="10.216498333333334">
+    <ele>0</ele>
+    <time>2022-08-18T23:41:42Z</time>
+</trkpt>
+                </trkseg>
+            </trk>
+</gpx>

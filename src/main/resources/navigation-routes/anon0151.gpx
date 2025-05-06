@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+            <trk>
+                <name>anon0151</name>
+                <trkseg>
+                    <trkpt lat="54.426948333333335" lon="10.176934999999999">
+    <ele>0</ele>
+    <time>2022-08-18T19:34:57Z</time>
+</trkpt>
+<trkpt lat="54.422675" lon="10.190249999999999">
+    <ele>0</ele>
+    <time>2022-08-18T19:40:28Z</time>
+</trkpt>
+<trkpt lat="54.41994833333333" lon="10.195636666666667">
+    <ele>0</ele>
+    <time>2022-08-18T19:43:01Z</time>
+</trkpt>
+                </trkseg>
+            </trk>
+</gpx>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+            <trk>
+                <name>anon0306</name>
+                <trkseg>
+                    <trkpt lat="54.43080833333333" lon="10.172005">
+    <ele>0</ele>
+    <time>2022-08-18T01:25:28Z</time>
+</trkpt>
+<trkpt lat="54.430785" lon="10.172">
+    <ele>0</ele>
+    <time>2022-08-18T01:31:28Z</time>
+</trkpt>
+<trkpt lat="54.43078166666667" lon="10.171965">
+    <ele>0</ele>
+    <time>2022-08-18T04:35:50Z</time>
+</trkpt>
+<trkpt lat="54.430791666666664" lon="10.171971666666668">
+    <ele>0</ele>
+    <time>2022-08-18T07:53:50Z</time>
+</trkpt>
+<trkpt lat="54.43078333333334" lon="10.171991666666665">
+    <ele>0</ele>
+    <time>2022-08-18T16:50:51Z</time>
+</trkpt>
+<trkpt lat="54.430775000000004" lon="10.171975">
+    <ele>0</ele>
+    <time>2022-08-18T17:53:51Z</time>
+</trkpt>
+<trkpt lat="54.43079" lon="10.171985000000001">
+    <ele>0</ele>
+    <time>2022-08-18T18:44:51Z</time>
+</trkpt>
+<trkpt lat="54.43080166666667" lon="10.171973333333334">
+    <ele>0</ele>
+    <time>2022-08-18T19:20:51Z</time>
+</trkpt>
+<trkpt lat="54.430805" lon="10.17196">
+    <ele>0</ele>
+    <time>2022-08-18T19:59:49Z</time>
+</trkpt>
+<trkpt lat="54.430791666666664" lon="10.171996666666667">
+    <ele>0</ele>
+    <time>2022-08-18T20:05:49Z</time>
+</trkpt>
+<trkpt lat="54.430791666666664" lon="10.171971666666668">
+    <ele>0</ele>
+    <time>2022-08-18T20:17:50Z</time>
+</trkpt>
+<trkpt lat="54.43080333333333" lon="10.171995">
+    <ele>0</ele>
+    <time>2022-08-18T21:05:51Z</time>
+</trkpt>
+<trkpt lat="54.430793333333334" lon="10.171985000000001">
+    <ele>0</ele>
+    <time>2022-08-18T21:29:51Z</time>
+</trkpt>
+<trkpt lat="54.43078166666667" lon="10.17199">
+    <ele>0</ele>
+    <time>2022-08-18T23:05:50Z</time>
+</trkpt>
+<trkpt lat="54.43081166666666" lon="10.172030000000001">
+    <ele>0</ele>
+    <time>2022-08-18T23:29:51Z</time>
+</trkpt>
+<trkpt lat="54.43076" lon="10.171961666666666">
+    <ele>0</ele>
+    <time>2022-08-18T23:44:50Z</time>
+</trkpt>
+<trkpt lat="54.430798333333335" lon="10.171975">
+    <ele>0</ele>
+    <time>2022-08-18T23:53:52Z</time>
+</trkpt>
+                </trkseg>
+            </trk>
+</gpx>

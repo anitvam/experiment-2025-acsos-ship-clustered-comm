@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+            <trk>
+                <name>anon0148</name>
+                <trkseg>
+                    <trkpt lat="54.43082666666667" lon="10.171858333333335">
+    <ele>0</ele>
+    <time>2022-08-18T03:06:54Z</time>
+</trkpt>
+<trkpt lat="54.430823333333336" lon="10.171848333333333">
+    <ele>0</ele>
+    <time>2022-08-18T03:21:54Z</time>
+</trkpt>
+<trkpt lat="54.43081333333334" lon="10.171846666666665">
+    <ele>0</ele>
+    <time>2022-08-18T03:51:54Z</time>
+</trkpt>
+<trkpt lat="54.43080833333333" lon="10.171865">
+    <ele>0</ele>
+    <time>2022-08-18T08:06:53Z</time>
+</trkpt>
+<trkpt lat="54.430836666666664" lon="10.171868333333332">
+    <ele>0</ele>
+    <time>2022-08-18T09:27:55Z</time>
+</trkpt>
+<trkpt lat="54.43080166666667" lon="10.171871666666668">
+    <ele>0</ele>
+    <time>2022-08-18T13:48:57Z</time>
+</trkpt>
+<trkpt lat="54.430825" lon="10.17189">
+    <ele>0</ele>
+    <time>2022-08-18T14:21:54Z</time>
+</trkpt>
+<trkpt lat="54.430815" lon="10.171891666666665">
+    <ele>0</ele>
+    <time>2022-08-18T15:48:55Z</time>
+</trkpt>
+<trkpt lat="54.43080833333333" lon="10.171899999999999">
+    <ele>0</ele>
+    <time>2022-08-18T17:09:57Z</time>
+</trkpt>
+<trkpt lat="54.430836666666664" lon="10.171871666666668">
+    <ele>0</ele>
+    <time>2022-08-18T19:51:54Z</time>
+</trkpt>
+<trkpt lat="54.43085" lon="10.171863333333333">
+    <ele>0</ele>
+    <time>2022-08-18T20:36:57Z</time>
+</trkpt>
+<trkpt lat="54.43085166666666" lon="10.171878333333332">
+    <ele>0</ele>
+    <time>2022-08-18T20:42:56Z</time>
+</trkpt>
+<trkpt lat="54.430823333333336" lon="10.17188">
+    <ele>0</ele>
+    <time>2022-08-18T22:45:57Z</time>
+</trkpt>
+<trkpt lat="54.43078666666667" lon="10.171898333333333">
+    <ele>0</ele>
+    <time>2022-08-18T23:36:54Z</time>
+</trkpt>
+<trkpt lat="54.430785" lon="10.171891666666665">
+    <ele>0</ele>
+    <time>2022-08-18T23:42:55Z</time>
+</trkpt>
+                </trkseg>
+            </trk>
+</gpx>

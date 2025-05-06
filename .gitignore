@@ -1,9 +1,6 @@
 #########################
 #### PROJECT IGNORES ####
 
-# Ignore GPS data routes
-src/main/resources/navigation-routes/**
-
 # Ignore raw data
 ais-data/
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+            <trk>
+                <name>anon0453</name>
+                <trkseg>
+                    <trkpt lat="54.79245" lon="10.861316666666665">
+    <ele>0</ele>
+    <time>2022-08-18T01:40:06Z</time>
+</trkpt>
+<trkpt lat="54.765049999999995" lon="10.862933333333332">
+    <ele>0</ele>
+    <time>2022-08-18T01:49:45Z</time>
+</trkpt>
+<trkpt lat="54.7592" lon="10.863383333333333">
+    <ele>0</ele>
+    <time>2022-08-18T01:51:45Z</time>
+</trkpt>
+<trkpt lat="54.75025" lon="10.864266666666667">
+    <ele>0</ele>
+    <time>2022-08-18T01:54:47Z</time>
+</trkpt>
+<trkpt lat="54.74736666666667" lon="10.864516666666667">
+    <ele>0</ele>
+    <time>2022-08-18T01:55:47Z</time>
+</trkpt>
+<trkpt lat="54.693916666666674" lon="10.88405">
+    <ele>0</ele>
+    <time>2022-08-18T02:15:35Z</time>
+</trkpt>
+<trkpt lat="54.66343333333334" lon="10.965683333333335">
+    <ele>0</ele>
+    <time>2022-08-18T02:37:36Z</time>
+</trkpt>
+<trkpt lat="54.65983333333334" lon="10.975050000000001">
+    <ele>0</ele>
+    <time>2022-08-18T02:40:07Z</time>
+</trkpt>
+<trkpt lat="54.65416666666667" lon="10.989749999999999">
+    <ele>0</ele>
+    <time>2022-08-18T02:43:56Z</time>
+</trkpt>
+<trkpt lat="54.620016666666665" lon="11.07925">
+    <ele>0</ele>
+    <time>2022-08-18T03:07:35Z</time>
+</trkpt>
+                </trkseg>
+            </trk>
+</gpx>

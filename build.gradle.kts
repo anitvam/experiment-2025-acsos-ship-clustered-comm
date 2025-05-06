@@ -137,7 +137,7 @@ File(rootProject.rootDir.path + "/src/main/yaml").listFiles()
             description = "Launches graphic simulation ${it.nameWithoutExtension}"
             mainClass.set("it.unibo.alchemist.Alchemist")
             classpath = sourceSets["main"].runtimeClasspath
-            dependsOn(createGpxRoutes)
+            // dependsOn(createGpxRoutes) // Creates the .gpx routes from AIS payloads
             args("run", it.absolutePath)
             javaLauncher.set(
                 javaToolchains.launcherFor {

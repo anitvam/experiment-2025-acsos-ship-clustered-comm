@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="AIS-to-GPX Converter" xmlns="http://www.topografix.com/GPX/1/1">
+            <trk>
+                <name>anon0375</name>
+                <trkseg>
+                    <trkpt lat="54.619036666666666" lon="10.166135">
+    <ele>0</ele>
+    <time>2022-08-18T12:34:28Z</time>
+</trkpt>
+<trkpt lat="54.61241833333334" lon="10.154738333333334">
+    <ele>0</ele>
+    <time>2022-08-18T12:38:07Z</time>
+</trkpt>
+<trkpt lat="54.59858333333333" lon="10.11905">
+    <ele>0</ele>
+    <time>2022-08-18T12:47:57Z</time>
+</trkpt>
+<trkpt lat="54.59647666666667" lon="10.111515">
+    <ele>0</ele>
+    <time>2022-08-18T12:49:57Z</time>
+</trkpt>
+<trkpt lat="54.596289999999996" lon="10.110803333333333">
+    <ele>0</ele>
+    <time>2022-08-18T12:50:08Z</time>
+</trkpt>
+<trkpt lat="54.59457999999999" lon="10.104485">
+    <ele>0</ele>
+    <time>2022-08-18T12:51:48Z</time>
+</trkpt>
+<trkpt lat="54.594413333333335" lon="10.103828333333333">
+    <ele>0</ele>
+    <time>2022-08-18T12:51:58Z</time>
+</trkpt>
+<trkpt lat="54.59424833333333" lon="10.103185">
+    <ele>0</ele>
+    <time>2022-08-18T12:52:08Z</time>
+</trkpt>
+<trkpt lat="54.59360166666667" lon="10.100596666666666">
+    <ele>0</ele>
+    <time>2022-08-18T12:52:48Z</time>
+</trkpt>
+<trkpt lat="54.59258666666666" lon="10.09685">
+    <ele>0</ele>
+    <time>2022-08-18T12:53:48Z</time>
+</trkpt>
+<trkpt lat="54.592303333333334" lon="10.095675">
+    <ele>0</ele>
+    <time>2022-08-18T12:54:07Z</time>
+</trkpt>
+<trkpt lat="54.58723833333333" lon="10.0663">
+    <ele>0</ele>
+    <time>2022-08-18T13:02:48Z</time>
+</trkpt>
+<trkpt lat="54.59190666666667" lon="10.059818333333334">
+    <ele>0</ele>
+    <time>2022-08-18T13:06:17Z</time>
+</trkpt>
+<trkpt lat="54.59627833333333" lon="10.052836666666668">
+    <ele>0</ele>
+    <time>2022-08-18T13:37:17Z</time>
+</trkpt>
+<trkpt lat="54.58316833333333" lon="10.042495">
+    <ele>0</ele>
+    <time>2022-08-18T15:18:27Z</time>
+</trkpt>
+                </trkseg>
+            </trk>
+</gpx>
