@@ -1,3 +1,76 @@
+## 1.0.0 (2025-05-06)
+
+### Features
+
+* add AIS antennas real positions to simulation ([1ecc13a](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/1ecc13adc122be2bdbb0b9c30ee4624ca3474495))
+* add effect for drawing communication between ships ([302e320](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/302e320ba2c4452e990b68a86087f5337d310077))
+* add extractors for metrics ([5a02418](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/5a02418cef3060a420e3233bc96396057a43c93f))
+* add manipulation of AIS raw data + add conversion AIS -> GPX ([50395df](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/50395df88d6f87a76c73e829274f374eb40eccd9))
+* add movement of ships using gps data extracted from ais & draw coastal information for reference ([c2935aa](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/c2935aaf6ef03e8db8da530accf8675f06d11b76))
+* add parent computation for baseline 3 using time instead of distance, organize code for experiment ([28d37fc](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/28d37fc4144dd59526339b0917080445c02b4724))
+* add some approx position of 5G antennas in Kiel ([f621136](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/f62113666e2714fec53bd03198764c098cabff76))
+* change termination criteria to 1 day ([ab4950b](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/ab4950b39c089aba187618d4fa8b0746e88a919f))
+* configure automation ([a96a3be](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/a96a3be8efa0ccede978309462e89c9ebfd431c9))
+* create gradle task to generate GPX data from raw ones ([ce3253a](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/ce3253a2d77ae4b664cfeff083fe7da8111b8441))
+* draft the two baselines ([378ad7d](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/378ad7df2ab8c0ba34f76d8f6cb5c85197d6ebbf))
+* fix cluster size metric and update simulation accordingly ([b11dddd](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/b11ddddcd4bba94c54e03afaaacb5a27443b4d2d))
+* fix navigation issue and geojson informations about borders of kiel fjord ([f9632f7](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/f9632f7e8577394e05e9a113a79f231b98761f5c))
+* generate metrics plot using matplotlib ([727c4d2](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/727c4d28d390d588dc46592cb1ed1fa8de54f9f8))
+* improve charts ([53e0c2b](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/53e0c2badedf0974915e81a780164f71064c3245))
+* improve coastal information for all northern germany ([22f6ad5](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/22f6ad5fa1f627f602bcdfcb25d564d12dd8b050))
+* improve navigation environment ([4826bdf](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4826bdf5afe656d298eaf5eee445cf4065b15b4a))
+* improve usage of geojson information, geojson graphical representation in the simulation, add template for customizing gps movement ([0644f50](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/0644f500b26b464f05d2c90a4c1730d7383d377f))
+* load boat id from gps trace ([13650d4](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/13650d41b2c638b1a62320184f412fb9176b9589))
+* move payload into simulation variable ([6c936bb](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/6c936bb20627a8815e77a8dc223231a0d3564e7f))
+* project startup using collektive template project. Currently working on the movement of the node. ([7684fbc](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/7684fbcd5fa07b1bb9ffe0081cc1ed10b318642d))
+* raw implementation for Reduction Factor metric ([35353d3](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/35353d3551fb1bfd480e212f1476483e2f316bc2))
+* remove the unused entrypoints in algo. ([88b6194](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/88b6194161b66e03873a1ad255fff09b288eb7e0))
+* rename testGPS into simulation + add Collektive gradient to experiment ([ba2cf7a](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/ba2cf7a8f635441f3893d83e2a585fdec8d43812))
+* separate aggregate algo. and metric utilities, add first draft for baseline ([bd62f32](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/bd62f32a7cc14ada60da31aadaeda8a5dbf66137))
+* update collektive and alchemist versions + use explicit reference for constructor parameters ([e994f6e](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/e994f6ebfc70571d7b8eacc3123b01dd18d2b549))
+
+### Bug Fixes
+
+*  fix process for processing raw data ([485a2f0](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/485a2f0f25ca02181692d85d16b8c0f4afe0613f))
+* add anonymized gpx traces ([08d6f1d](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/08d6f1d31d2c8f055e18b94ef2e6ccd94b22f5c8))
+* **ci:** correctly format build-and-deploy.yml ([7613d9d](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/7613d9d9726ea488148355ca5f435729fedabbaa))
+* exporters values ([57d7607](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/57d760742f9627c02e8057d72ec4bf885686246b))
+* fix simulation path for the .pbf resource ([0fbaf86](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/0fbaf866cf26115f09d26b90a7b50c62ad3e400c))
+* fix tests to execute correctly ([c32910d](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/c32910db1d811339d01d97ae3bcb04efb69f1306))
+* remove hard path to home directory ([7d30947](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/7d30947537b6c40eb6c61d4ee5561c2b34406b5e))
+* remove unused additional simulation file ([4c6de51](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4c6de51fe44fe88ba72cdde16a69cbe6e94bf59d))
+* udpate project name to aggreg_colav ([e406158](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/e406158944158930a889dd2f93a259db4813d332))
+* update .gitignore ([4f3e663](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4f3e6630ecce6946107e57ff819a47f555a1b725))
+
+### Tests
+
+* add limitation of the polygon representation for this scope ([7fb8ff1](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/7fb8ff153b88b06ff4e6a28fcac93f4edadd72eb))
+* add test for reading geojson and determining if LngLat are in Polygon boundaries ([2d20742](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/2d20742e3e381301405f64a1da923f58375270e7))
+
+### Build and continuous integration
+
+* add geojson map with only the coastal line ([4eeae0b](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4eeae0be7bf27b93b73e7cdaa694fc36a66c19c5))
+* exclude big maps from vesionnning ([2b0dfa8](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/2b0dfa858672ce8f761695df401e60a072fb2e55))
+* exclude maps files from versionning ([60dfcf0](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/60dfcf0e8c71381614d66cb50352ca3a2474980e))
+* exclude vscode and .geojson files from versionning ([640fcc1](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/640fcc19c54c1b49be5c1ab1a6a891e7bcdc8bef))
+* exclude vscode history from versionning. ([3dc4a4d](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/3dc4a4dc58f06ee2ca19feb15157631ffdb90f5e))
+
+### General maintenance
+
+* add ais-sample data and description ([8c10fd0](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/8c10fd0277c1ad1349145698f47f79b32183b7a8))
+* change package structure for geojson manipulation ([0f76b40](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/0f76b40608703dc052ace0f228c61e07cf374cb8))
+* cleanup ([4a1af46](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4a1af461e402287648bf909835af7816fd0879e4))
+* cleanup .gradle/ ([26e0623](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/26e0623670151bafdf7aad076d1e78b44574b195))
+* fix tests ([3fcbc51](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/3fcbc516a321429a1c9f3208e35c1221b5e81168))
+* format table for AIS data explaination ([2f4db07](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/2f4db07b1d794ee97ddb9bfa7d0cb5efb903720c))
+* remove previous images ([9f70dfc](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/9f70dfc3e4e14b1ff535dbf4e3e1e294bc2f4983))
+* remove trajectory effect from GUI representation ([3d22b02](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/3d22b029eff14fef350ff88d2b6c682e2ba9e8cf))
+* update .gitignore to ignore all raw data ([130b7e3](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/130b7e3e9b879b704a0335f71cd84523d48ed76e))
+
+### Refactoring
+
+* housekeep the maps ([f84e6d7](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/f84e6d700fd48b78ef98302b53ebfd56b8fb31b0))
+
 ## [1.0.24](https://github.com/Collektive/collektive-experiments-bootstrap/compare/1.0.23...1.0.24) (2025-01-26)
 
 ### Dependency updates
