@@ -1,13 +1,5 @@
-# Alchemist Experiments Bootstrap
-
-A customized Alchemist Primer with releases and data analysis ready.
-
-Upon generation of an experiment from this template:
-1. add a secret github token with `repo` permissions named `DEPLOYMENT_TOKEN`;
-2. edit the project name in `settings.gradle.kts`;
-3. edit the DockerHub user name in `docker-compose.yml`;
-4. add a secret called `DOCKER_PASSWORD` with your DockerHub password;
-5. edit the DockerHub password in `.github/workflows/build-and-deploy.yml`;
+# Experiments for Robust Communication through Collective Adaptive Relay Schemes for Maritime Vessels
+# Submitted for [ACSOS 2025](https://conf.researchr.org/home/acsos-2025) conference
 
 ## Reproduce the entire experiment
 
@@ -30,7 +22,9 @@ Upon generation of an experiment from this template:
 3. Launch either:
     - `./gradlew runAllBatch` on Linux, MacOS, or Windows if a bash-compatible shell is available;
     - `gradlew.bat runAllBatch` on Windows cmd or Powershell;
-4. Once the experiment is finished, the results will be available in the `data` folder. Run:
+4. Once the experiment is finished, the results will be available in the `data` folder. Then run:
+    - `python -m venv venv`
+    - `source venv/bin/activate`
     - `pip install --upgrade pip`
     - `pip install -r requirements.txt`
     - `python process.py`
@@ -40,7 +34,7 @@ Upon generation of an experiment from this template:
 
 Follow the instructions for reproducing the entire experiment natively, but instead of running `runAllBatch`,
 run `runEXPERIMENTGraphics`, replacing `EXPERIMENT` with the name of the experiment you want to run
-(namely, with the name of the YAML simulation file).
+(namely, with the name of the YAML simulation file, that can be found under `src/main/yaml` folder).
 
 If in doubt, run `./gradlew tasks` to see the list of available tasks.
 

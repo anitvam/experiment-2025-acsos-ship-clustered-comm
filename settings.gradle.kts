@@ -11,4 +11,4 @@ develocity {
     }
 }
 
-rootProject.name = "aggreg_colav"
+rootProject.name = "experiment-2025-acsos-ship-clustered-comm"
