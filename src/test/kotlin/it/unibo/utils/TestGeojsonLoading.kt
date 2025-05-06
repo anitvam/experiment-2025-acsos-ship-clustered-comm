@@ -27,7 +27,7 @@ class TestGeojsonLoading {
 
     @Test
     fun loadGeojson() {
-        val geojsonFile = File("/home/anitvam/work/experiments/aggreg_colav/src/main/resources/maps/coast_only.geojson")
+        val geojsonFile = File("src/main/resources/maps/coast_only.geojson")
         //println(geojsonFile.bufferedReader().readLines())
         val customMapper = ObjectMapper()
             .registerKotlinModule()
