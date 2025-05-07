@@ -682,16 +682,16 @@ if __name__ == '__main__':
 
     
     
-    #linechart_datarate(means[experiment], stdevs[experiment] )
-    #linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
-    #linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
-    #linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
-    # linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
-    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
-    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
-    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
-    # barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
-    # barchart_datarate(means[experiment], stdevs[experiment])
+    linechart_datarate(means[experiment], stdevs[experiment] )
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
+    linechart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'n_clusters',  'Mean Number of Clusters', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'cluster-size[mean]',  'Mean Cluster Size', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'clustersComposedOfOneElement',  'Singleton Clusters', None, None)
+    barchart_clusteredmetrics(means[experiment], stdevs[experiment], 'reduction-factor[mean]',  'Mean Reduction Factor', 0.7, 1)
+    barchart_datarate(means[experiment], stdevs[experiment])
     plot_metric_chart()
     
     

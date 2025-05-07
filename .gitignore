@@ -4,6 +4,9 @@
 # Ignore raw data
 ais-data/
 
+# Ignore generated charts
+charts/
+
 #########################
 
 # Byte-compiled / optimized / DLL files
