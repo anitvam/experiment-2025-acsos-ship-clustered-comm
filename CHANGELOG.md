@@ -1,3 +1,26 @@
+## [1.0.1](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.0...1.0.1) (2025-05-07)
+
+### Dependency updates
+
+* **deps:** update aislib to v2.8.5 ([#1](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/1)) ([5c2f7b4](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/5c2f7b4534f7adf7c36d0df1b9d8e53d19a00ebe))
+* **deps:** update alchemist to v42.0.9 ([#2](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/2)) ([eaaf7d5](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/eaaf7d574406b01368a41bbb5237a96193bb2348))
+* **deps:** update alpine docker tag to v3.21.3 ([#3](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/3)) ([2300473](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/2300473be51a8e375051acc780c4215edbbb624f))
+* **deps:** update dependency matplotlib to v3.10.1 ([#4](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/4)) ([f550ae1](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/f550ae1232e85a20579c871cafca56624ebf775b))
+
+### Bug Fixes
+
+* add .env configuration for docker compose ([3cce427](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/3cce4278e77c9042b079b69a7d48d1f6cae11afe))
+* **deps:** update dependency gradle to v8.14 ([ee90575](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/ee90575cc7ff50d7f03596b36a6a2ee80243fd56))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.127 ([a5737fc](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/a5737fc83fe0ff00c06e1f2b878033d0814c7270))
+* **deps:** update jackson monorepo to v2.14.3 ([939c3ab](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/939c3ab6851a3d5ccbba6ca94445d0c70513f16b))
+* update process.py to generate all charts ([4e65448](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4e65448628860b9c8f851af8111a92ac62be6cff))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.0 [skip ci] ([b1df94a](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/b1df94a4a6761d170742f31a797704c19087fdf3))
+* Update README.md ([10c4866](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/10c4866b6f9237e707c3babe5f70869896831243))
+* Update renovate.json ([048e838](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/048e83845b4d2e4a6f83eb35fdb0d9b48399a62e))
+
 ## 1.0.0 (2025-05-06)
 
 ### Features
