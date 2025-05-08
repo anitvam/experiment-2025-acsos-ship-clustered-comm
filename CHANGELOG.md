@@ -1,3 +1,13 @@
+## [1.0.6](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.5...1.0.6) (2025-05-08)
+
+### Bug Fixes
+
+* **deps:** update plugin tasktree to v4.0.1 ([#11](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/11)) ([c24011c](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/c24011c7362573f02b5f768c290db4838a5ab41e))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.5 [skip ci] ([238921e](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/238921ed5b854d36e5c4b97d1eea099d7273dade))
+
 ## [1.0.5](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.4...1.0.5) (2025-05-08)
 
 ### Bug Fixes
