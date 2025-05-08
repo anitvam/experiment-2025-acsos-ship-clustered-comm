@@ -1,3 +1,13 @@
+## [1.0.7](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.6...1.0.7) (2025-05-08)
+
+### Bug Fixes
+
+* **deps:** update python docker tag to v3.13.3 ([#12](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/12)) ([230eca0](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/230eca0c2fc61ee3ce6e38c722932733ef906178))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.6 [skip ci] ([8466b19](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/8466b19976ec3a347b756ae76a718cc452440cdc))
+
 ## [1.0.6](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.5...1.0.6) (2025-05-08)
 
 ### Bug Fixes
