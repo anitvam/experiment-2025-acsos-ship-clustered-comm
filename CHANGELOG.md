@@ -1,3 +1,13 @@
+## [1.0.12](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.11...1.0.12) (2025-05-09)
+
+### Bug Fixes
+
+* **deps:** update jackson monorepo to v2.15.4 ([#40](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/40)) ([56f18f3](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/56f18f39272905ee60f8584e8bdb7287a28118c6))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.11 [skip ci] ([4547565](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/45475652f33860cc5a90da94a989cea1091aefea))
+
 ## [1.0.11](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.10...1.0.11) (2025-05-09)
 
 ### Bug Fixes
