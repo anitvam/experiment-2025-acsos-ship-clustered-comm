@@ -18,10 +18,10 @@ collektive-plugin = { module = "it.unibo.collektive:collektive-compiler-plugin",
 collektive-stdlib = { module = "it.unibo.collektive:collektive-stdlib", version.ref = "collektive" }
 
 data2viz-geojson = { module = "io.data2viz.geojson:geojson-jvm", version = "0.6.0" }
-jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version = "2.14.3" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.14.3" }
-jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version = "2.14.3" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version = "2.14.3" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version = "2.15.4" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.15.4" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version = "2.15.4" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version = "2.15.4" }
 
 aislib-messages = { module = "dk.dma.ais.lib:ais-lib-messages", version.ref = "aislib" }
 aislib-utils = { module = "dk.dma.ais.lib:ais-lib-utils", version.ref = "aislib" }
