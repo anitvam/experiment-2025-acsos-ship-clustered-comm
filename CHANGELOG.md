@@ -1,3 +1,13 @@
+## [1.0.22](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.21...1.0.22) (2025-05-11)
+
+### Bug Fixes
+
+* **deps:** update plugin kotlin-qa to v0.82.0 ([#50](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/50)) ([7fe6926](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/7fe6926907ffe96500051c4f0feb2e66a50121e4))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.21 [skip ci] ([a6250bd](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/a6250bd7e1d79fb1cd34958a76f5e4ac0607439a))
+
 ## [1.0.21](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.20...1.0.21) (2025-05-11)
 
 ### Bug Fixes
