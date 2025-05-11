@@ -1,3 +1,13 @@
+## [1.0.25](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.24...1.0.25) (2025-05-11)
+
+### Bug Fixes
+
+* **deps:** update dependency matplotlib to v3.10.3 ([#62](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/62)) ([6d441ca](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/6d441cae578c7d4eb963eac332bab9154f2d4af6))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.24 [skip ci] ([268126a](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/268126a83ca901110e752c73f9cc4edcd384de01))
+
 ## [1.0.24](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.23...1.0.24) (2025-05-11)
 
 ### Bug Fixes
