@@ -1,3 +1,13 @@
+## [1.0.31](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.30...1.0.31) (2025-05-13)
+
+### Bug Fixes
+
+* **deps:** update dependency windows github actions runner to v2025 ([#58](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/58)) ([e23fb94](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/e23fb94a93d2c917c24b3a6383431859fe47042c))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.30 [skip ci] ([0aa706c](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/0aa706cbc0371ae3140e83882cf974c12735b40d))
+
 ## [1.0.30](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.29...1.0.30) (2025-05-12)
 
 ### Bug Fixes
