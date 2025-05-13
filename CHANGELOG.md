@@ -1,3 +1,13 @@
+## [1.0.34](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.33...1.0.34) (2025-05-13)
+
+### Bug Fixes
+
+* **core-deps:** update dependency org.jetbrains.kotlin.jvm to v2.1.21 ([#63](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/63)) ([4b4b29f](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/4b4b29f52abad964c93a0f9a8a27a03d49978c70))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.33 [skip ci] ([cf77c22](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/cf77c2258efb386e0d1a67fc2a8f9acdd61ddc4c))
+
 ## [1.0.33](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.32...1.0.33) (2025-05-13)
 
 ### Bug Fixes
