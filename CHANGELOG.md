@@ -1,3 +1,13 @@
+## [1.0.33](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.32...1.0.33) (2025-05-13)
+
+### Bug Fixes
+
+* **deps:** update eclipse-temurin docker tag to v23 ([#60](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/60)) ([8352b0b](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/8352b0bcde24c4687012c8d188838de929684291))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.32 [skip ci] ([f925dfb](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/f925dfb2a35e7ed291bb52929d4d1f855750e67b))
+
 ## [1.0.32](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.31...1.0.32) (2025-05-13)
 
 ### Bug Fixes
