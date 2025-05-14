@@ -1,3 +1,13 @@
+## [1.0.36](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.35...1.0.36) (2025-05-14)
+
+### Bug Fixes
+
+* **deps:** update plugin multijvmtesting to v3.4.2 ([#65](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/65)) ([bb29240](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/bb2924026f7809884ad0f28e0cc5bef07989b2c3))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.35 [skip ci] ([e8e8252](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/e8e8252e5ab737a13636d25ce50bcb4afae9e450))
+
 ## [1.0.35](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.34...1.0.35) (2025-05-13)
 
 ### Bug Fixes
