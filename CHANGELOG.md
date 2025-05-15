@@ -1,3 +1,13 @@
+## [1.0.41](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.40...1.0.41) (2025-05-15)
+
+### Bug Fixes
+
+* **deps:** update plugin gitsemver to v5 ([#25](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/25)) ([67c1f33](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/67c1f33da82f848646d0726c09b80fdbbfa42fcb))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.40 [skip ci] ([9cefa0f](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/9cefa0f5b4499c5eb79097ac20ded1ed01959e18))
+
 ## [1.0.40](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.39...1.0.40) (2025-05-14)
 
 ### Bug Fixes
