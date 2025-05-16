@@ -1,3 +1,13 @@
+## [1.0.44](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.43...1.0.44) (2025-05-16)
+
+### Bug Fixes
+
+* **deps:** update dependency io.arrow-kt:arrow-core to v2.1.2 ([#70](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/70)) ([7be8104](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/7be810459d8ba25ba2dc7447f314aceb8854edbd))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.43 [skip ci] ([37e09cd](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/37e09cdf7b4ad663939a0c206e1f9fa43dcd379f))
+
 ## [1.0.43](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.42...1.0.43) (2025-05-16)
 
 ### Bug Fixes
