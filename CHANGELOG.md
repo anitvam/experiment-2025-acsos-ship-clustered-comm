@@ -1,3 +1,13 @@
+## [1.0.47](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.46...1.0.47) (2025-05-20)
+
+### Bug Fixes
+
+* **deps:** update plugin org.gradle.toolchains.foojay-resolver-convention to v1 ([#73](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/73)) ([b9424ea](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/b9424ead1783b17f46ba96b06c850aadee294b3d))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.46 [skip ci] ([5baf2b8](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/5baf2b81875974602acd742f61ce83f02d4ca738))
+
 ## [1.0.46](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.45...1.0.46) (2025-05-20)
 
 ### Bug Fixes
