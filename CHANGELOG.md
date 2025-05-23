@@ -1,3 +1,13 @@
+## [1.0.48](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.47...1.0.48) (2025-05-23)
+
+### Bug Fixes
+
+* **deps:** update dependency gradle to v8.14.1 ([#74](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/74)) ([a43ab3b](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/a43ab3bf8f003f9ec906d73870ba361fda50e105))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.47 [skip ci] ([f416dfe](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/f416dfeb5e7c4c1bb8506a26a1da24473e43f589))
+
 ## [1.0.47](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.46...1.0.47) (2025-05-20)
 
 ### Bug Fixes
