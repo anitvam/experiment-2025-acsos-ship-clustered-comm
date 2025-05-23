@@ -1,7 +1,7 @@
 [versions]
 arrow = "2.1.2"
 kotlin = "2.1.21"
-alchemist = "42.2.0"
+alchemist = "42.2.1"
 collektive = "22.3.2"
 aislib = "2.8.5"
 
