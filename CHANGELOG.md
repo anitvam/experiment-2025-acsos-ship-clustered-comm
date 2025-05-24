@@ -1,3 +1,13 @@
+## [1.0.52](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.51...1.0.52) (2025-05-24)
+
+### Bug Fixes
+
+* **deps:** update alchemist to v42.2.1 ([#80](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/issues/80)) ([c3c5bc9](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/c3c5bc9df620c2882a0a61f2ded0a7e6b5af537b))
+
+### General maintenance
+
+* **release:** update gradle.properties .env versions to 1.0.51 [skip ci] ([d0aa1e8](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/commit/d0aa1e85541a8c36ab18321e4b5b7570d16c91c6))
+
 ## [1.0.51](https://github.com/anitvam/experiment-2025-acsos-ship-clustered-comm/compare/1.0.50...1.0.51) (2025-05-23)
 
 ### Bug Fixes
