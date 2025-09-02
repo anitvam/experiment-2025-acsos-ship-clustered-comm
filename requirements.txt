@@ -1,2 +1,2 @@
-matplotlib ==3.10.5
+matplotlib ==3.10.6
 xarray ==2025.8.0
