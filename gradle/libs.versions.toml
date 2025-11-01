@@ -1,5 +1,5 @@
 [versions]
-arrow = "2.1.2"
+arrow = "2.2.0"
 kotlin = "2.1.21"
 alchemist = "42.2.3"
 collektive = "22.3.2"
